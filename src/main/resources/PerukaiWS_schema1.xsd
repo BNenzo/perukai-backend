@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema version="1.0" targetNamespace="http://services.perukai.das.ubp.edu.ar/" xmlns:tns="http://services.perukai.das.ubp.edu.ar/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="ObtenerProvinciasRequest" type="tns:ObtenerProvinciasRequest"/>
+
+  <xs:element name="ObtenerProvinciasResponse" type="tns:ObtenerProvinciasResponse"/>
+
+  <xs:complexType name="ObtenerProvinciasRequest">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="ObtenerProvinciasResponse">
+    <xs:sequence>
+      <xs:element name="ProvinciasResponse" type="tns:provinciaBean" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="provinciaBean">
+    <xs:sequence>
+      <xs:element name="codProvincia" type="xs:string" minOccurs="0"/>
+      <xs:element name="nomProvincia" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+
