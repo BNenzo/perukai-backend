@@ -1,5 +1,6 @@
 package ar.edu.ubp.das.perukai.services;
 
+import ar.edu.ubp.das.perukai.beans.ClicksContenidosRestaurantesBean;
 import ar.edu.ubp.das.perukai.beans.ProvinciaBean;
 import ar.edu.ubp.das.perukai.repositories.PerukaiRepository;
 import jakarta.jws.WebMethod;
@@ -24,5 +25,13 @@ public class PerukaiWS {
   @WebResult(name = "ProvinciasResponse")
   public List<ProvinciaBean> obtenerProvincias() {
     return localidadesRepository.getProvincias();
+  }
+
+  @WebMethod(operationName = "RegistrarClickContenido")
+  @RequestWrapper(localName = "RegistrarClickContenidoRequest")
+  @ResponseWrapper(localName = "RegistrarClickContenidoResponse")
+  public void registrarClickContenido(
+      @WebParam(name = "ClicksContenidosRestaurantes") ClicksContenidosRestaurantesBean body) {
+    localidadesRepository.registrarClickContenido(body);
   }
 }

@@ -1,9 +1,11 @@
 package ar.edu.ubp.das.perukai.endpoint;
 
+import ar.edu.ubp.das.perukai.beans.ClicksContenidosRestaurantesBean;
 import ar.edu.ubp.das.perukai.beans.ProvinciaBean;
 import ar.edu.ubp.das.perukai.services.PerukaiWS;
 import ar.edu.ubp.das.perukai.services.jaxws.ObtenerProvinciasResponse;
-
+import ar.edu.ubp.das.perukai.services.jaxws.RegistrarClickContenido;
+import ar.edu.ubp.das.perukai.services.jaxws.RegistrarClickContenidoResponse;
 import ar.edu.ubp.das.perukai.services.jaxws.ObtenerProvincias;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,5 +34,13 @@ public class PerukaiEndpoint {
     ObtenerProvinciasResponse response = new ObtenerProvinciasResponse();
     response.setProvinciasResponse(paises);
     return response;
+  }
+
+  @PayloadRoot(namespace = NAMESPACE_URI, localPart = "RegistrarClickContenidoRequest")
+  @ResponsePayload
+  public RegistrarClickContenidoResponse insertarLocalidad(@RequestPayload RegistrarClickContenido request) {
+    ClicksContenidosRestaurantesBean click = request.getClicksContenidosRestaurantes();
+    perukaiService.registrarClickContenido(click);
+    return new RegistrarClickContenidoResponse();
   }
 }

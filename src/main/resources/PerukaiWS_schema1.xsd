@@ -5,6 +5,31 @@
 
   <xs:element name="ObtenerProvinciasResponse" type="tns:ObtenerProvinciasResponse"/>
 
+  <xs:element name="RegistrarClickContenidoRequest" type="tns:RegistrarClickContenidoRequest"/>
+
+  <xs:element name="RegistrarClickContenidoResponse" type="tns:RegistrarClickContenidoResponse"/>
+
+  <xs:complexType name="RegistrarClickContenidoRequest">
+    <xs:sequence>
+      <xs:element name="ClicksContenidosRestaurantes" type="tns:clicksContenidosRestaurantesBean" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="clicksContenidosRestaurantesBean">
+    <xs:sequence>
+      <xs:element name="costoClick" type="xs:decimal" minOccurs="0"/>
+      <xs:element name="fechaHoraRegistro" type="xs:string" minOccurs="0"/>
+      <xs:element name="nroClick" type="xs:int"/>
+      <xs:element name="nroCliente" type="xs:int" minOccurs="0"/>
+      <xs:element name="nroContenido" type="xs:int"/>
+      <xs:element name="nroRestaurante" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="RegistrarClickContenidoResponse">
+    <xs:sequence/>
+  </xs:complexType>
+
   <xs:complexType name="ObtenerProvinciasRequest">
     <xs:sequence/>
   </xs:complexType>
