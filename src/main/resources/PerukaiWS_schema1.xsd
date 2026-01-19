@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xs:schema version="1.0" targetNamespace="http://services.perukai.das.ubp.edu.ar/" xmlns:tns="http://services.perukai.das.ubp.edu.ar/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
+  <xs:element name="ObtenerContenidosNoPublicadosRequest" type="tns:ObtenerContenidosNoPublicadosRequest"/>
+
+  <xs:element name="ObtenerContenidosNoPublicadosResponse" type="tns:ObtenerContenidosNoPublicadosResponse"/>
+
   <xs:element name="ObtenerProvinciasRequest" type="tns:ObtenerProvinciasRequest"/>
 
   <xs:element name="ObtenerProvinciasResponse" type="tns:ObtenerProvinciasResponse"/>
@@ -44,6 +48,28 @@
     <xs:sequence>
       <xs:element name="codProvincia" type="xs:string" minOccurs="0"/>
       <xs:element name="nomProvincia" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ObtenerContenidosNoPublicadosRequest">
+    <xs:sequence/>
+  </xs:complexType>
+
+  <xs:complexType name="ObtenerContenidosNoPublicadosResponse">
+    <xs:sequence>
+      <xs:element name="ContenidosNoPublicadosResponse" type="tns:contenidoNoPublicadoBean" minOccurs="0" maxOccurs="unbounded"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="contenidoNoPublicadoBean">
+    <xs:sequence>
+      <xs:element name="contenidoAPublicar" type="xs:string" minOccurs="0"/>
+      <xs:element name="costoClick" type="xs:decimal" minOccurs="0"/>
+      <xs:element name="imagenAPublicar" type="xs:string" minOccurs="0"/>
+      <xs:element name="nroContenido" type="xs:int"/>
+      <xs:element name="nroRestaurante" type="xs:int"/>
+      <xs:element name="nroSucursal" type="xs:int" minOccurs="0"/>
+      <xs:element name="publicado" type="xs:int"/>
     </xs:sequence>
   </xs:complexType>
 </xs:schema>

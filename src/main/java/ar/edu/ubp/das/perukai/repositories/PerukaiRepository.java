@@ -1,6 +1,7 @@
 package ar.edu.ubp.das.perukai.repositories;
 
 import ar.edu.ubp.das.perukai.beans.ClicksContenidosRestaurantesBean;
+import ar.edu.ubp.das.perukai.beans.ContenidoNoPublicadoBean;
 import ar.edu.ubp.das.perukai.beans.ProvinciaBean;
 import ar.edu.ubp.das.perukai.components.SimpleJdbcCallFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,5 +29,17 @@ public class PerukaiRepository {
         .addValue("costo_click", body.getCostoClick());
 
     jdbcCallFactory.executeWithOutputs("sp_insert_click_contenido", "dbo", p);
+  }
+
+  // OBTENER CONTENIDOS NO PUBLICADOS
+  public List<ContenidoNoPublicadoBean> getContenidosNoPublicados() {
+    MapSqlParameterSource p = new MapSqlParameterSource();
+
+    return jdbcCallFactory.executeQuery(
+        "sp_get_contenidos_no_publicados",
+        "dbo",
+        p,
+        "contenidos_no_publicados",
+        ContenidoNoPublicadoBean.class);
   }
 }

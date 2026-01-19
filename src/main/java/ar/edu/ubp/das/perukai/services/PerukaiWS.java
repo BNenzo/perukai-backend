@@ -1,6 +1,7 @@
 package ar.edu.ubp.das.perukai.services;
 
 import ar.edu.ubp.das.perukai.beans.ClicksContenidosRestaurantesBean;
+import ar.edu.ubp.das.perukai.beans.ContenidoNoPublicadoBean;
 import ar.edu.ubp.das.perukai.beans.ProvinciaBean;
 import ar.edu.ubp.das.perukai.repositories.PerukaiRepository;
 import jakarta.jws.WebMethod;
@@ -33,5 +34,14 @@ public class PerukaiWS {
   public void registrarClickContenido(
       @WebParam(name = "ClicksContenidosRestaurantes") ClicksContenidosRestaurantesBean body) {
     localidadesRepository.registrarClickContenido(body);
+  }
+
+  // OBTENER CONTENIDOS NO PUBLICADOS
+  @WebMethod(operationName = "ObtenerContenidosNoPublicados")
+  @RequestWrapper(localName = "ObtenerContenidosNoPublicadosRequest")
+  @ResponseWrapper(localName = "ObtenerContenidosNoPublicadosResponse")
+  @WebResult(name = "ContenidosNoPublicadosResponse")
+  public List<ContenidoNoPublicadoBean> obtenerContenidosNoPublicados() {
+    return localidadesRepository.getContenidosNoPublicados();
   }
 }
