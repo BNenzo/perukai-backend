@@ -18,6 +18,12 @@
   <message name="RegistrarClickContenidoResponse">
     <part name="parameters" element="tns:RegistrarClickContenidoResponse"/>
   </message>
+  <message name="ObtenerContenidosNoPublicados">
+    <part name="parameters" element="tns:ObtenerContenidosNoPublicadosRequest"/>
+  </message>
+  <message name="ObtenerContenidosNoPublicadosResponse">
+    <part name="parameters" element="tns:ObtenerContenidosNoPublicadosResponse"/>
+  </message>
   <portType name="PerukaiWS">
     <operation name="ObtenerProvincias">
       <input wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/ObtenerProvinciasRequest" message="tns:ObtenerProvincias"/>
@@ -26,6 +32,10 @@
     <operation name="RegistrarClickContenido">
       <input wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/RegistrarClickContenidoRequest" message="tns:RegistrarClickContenido"/>
       <output wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/RegistrarClickContenidoResponse" message="tns:RegistrarClickContenidoResponse"/>
+    </operation>
+    <operation name="ObtenerContenidosNoPublicados">
+      <input wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/ObtenerContenidosNoPublicadosRequest" message="tns:ObtenerContenidosNoPublicados"/>
+      <output wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/ObtenerContenidosNoPublicadosResponse" message="tns:ObtenerContenidosNoPublicadosResponse"/>
     </operation>
   </portType>
   <binding name="PerukaiWSPortBinding" type="tns:PerukaiWS">
@@ -40,6 +50,15 @@
       </output>
     </operation>
     <operation name="RegistrarClickContenido">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+    <operation name="ObtenerContenidosNoPublicados">
       <soap:operation soapAction=""/>
       <input>
         <soap:body use="literal"/>
