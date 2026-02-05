@@ -24,6 +24,12 @@
   <message name="ObtenerContenidosNoPublicadosResponse">
     <part name="parameters" element="tns:ObtenerContenidosNoPublicadosResponse"/>
   </message>
+  <message name="ActualizarReservaCliente">
+    <part name="parameters" element="tns:ActualizarReservaClienteRequest"/>
+  </message>
+  <message name="ActualizarReservaClienteResponse">
+    <part name="parameters" element="tns:ActualizarReservaClienteResponse"/>
+  </message>
   <portType name="PerukaiWS">
     <operation name="ObtenerProvincias">
       <input wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/ObtenerProvinciasRequest" message="tns:ObtenerProvincias"/>
@@ -36,6 +42,10 @@
     <operation name="ObtenerContenidosNoPublicados">
       <input wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/ObtenerContenidosNoPublicadosRequest" message="tns:ObtenerContenidosNoPublicados"/>
       <output wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/ObtenerContenidosNoPublicadosResponse" message="tns:ObtenerContenidosNoPublicadosResponse"/>
+    </operation>
+    <operation name="ActualizarReservaCliente">
+      <input wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/ActualizarReservaClienteRequest" message="tns:ActualizarReservaCliente"/>
+      <output wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/ActualizarReservaClienteResponse" message="tns:ActualizarReservaClienteResponse"/>
     </operation>
   </portType>
   <binding name="PerukaiWSPortBinding" type="tns:PerukaiWS">
@@ -59,6 +69,15 @@
       </output>
     </operation>
     <operation name="ObtenerContenidosNoPublicados">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+    <operation name="ActualizarReservaCliente">
       <soap:operation soapAction=""/>
       <input>
         <soap:body use="literal"/>
