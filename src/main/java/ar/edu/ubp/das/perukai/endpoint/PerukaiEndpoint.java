@@ -3,11 +3,14 @@ package ar.edu.ubp.das.perukai.endpoint;
 import ar.edu.ubp.das.perukai.beans.ActualizarReservaClienteRequestBean;
 import ar.edu.ubp.das.perukai.beans.ClicksContenidosRestaurantesBean;
 import ar.edu.ubp.das.perukai.beans.ContenidoNoPublicadoBean;
+import ar.edu.ubp.das.perukai.beans.CrearReservaConClienteBean;
 import ar.edu.ubp.das.perukai.beans.ProvinciaBean;
 import ar.edu.ubp.das.perukai.services.PerukaiWS;
 import ar.edu.ubp.das.perukai.services.jaxws.ObtenerProvinciasResponse;
 import ar.edu.ubp.das.perukai.services.jaxws.RegistrarClickContenido;
 import ar.edu.ubp.das.perukai.services.jaxws.RegistrarClickContenidoResponse;
+import ar.edu.ubp.das.perukai.services.jaxws.CrearReservaDesdeRistorino;
+import ar.edu.ubp.das.perukai.services.jaxws.CrearReservaDesdeRistorinoResponse;
 import ar.edu.ubp.das.perukai.services.jaxws.ActualizarReservaCliente;
 import ar.edu.ubp.das.perukai.services.jaxws.ActualizarReservaClienteResponse;
 import ar.edu.ubp.das.perukai.services.jaxws.ObtenerContenidosNoPublicados;
@@ -61,6 +64,16 @@ public class PerukaiEndpoint {
     return response;
   }
 
+  // CREAR RESERVA EN UNA SUCURSAL
+  @PayloadRoot(namespace = NAMESPACE_URI, localPart = "CrearReservaDesdeRistorinoRequest")
+  @ResponsePayload
+  public CrearReservaDesdeRistorinoResponse crearReservaDesdeRistorino(
+      @RequestPayload CrearReservaDesdeRistorino request) {
+    CrearReservaConClienteBean reserva = request.getCrearReservaDesdeRistorinoRequest();
+    perukaiService.crearReservaDesdeRistorino(reserva);
+    return new CrearReservaDesdeRistorinoResponse();
+  }
+
   // // ACTUALIZAR LA RESERVA DE UN CLIENTE
   @PayloadRoot(namespace = NAMESPACE_URI, localPart = "ActualizarReservaClienteRequest")
   @ResponsePayload
@@ -70,4 +83,5 @@ public class PerukaiEndpoint {
     perukaiService.actualizarReservaCliente(actualizarReservaCliente);
     return new ActualizarReservaClienteResponse();
   }
+
 }

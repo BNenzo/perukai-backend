@@ -5,6 +5,10 @@
 
   <xs:element name="ActualizarReservaClienteResponse" type="tns:ActualizarReservaClienteResponse"/>
 
+  <xs:element name="CrearReservaDesdeRistorinoRequest" type="tns:CrearReservaDesdeRistorinoRequest"/>
+
+  <xs:element name="CrearReservaDesdeRistorinoResponse" type="tns:CrearReservaDesdeRistorinoResponse"/>
+
   <xs:element name="ObtenerContenidosNoPublicadosRequest" type="tns:ObtenerContenidosNoPublicadosRequest"/>
 
   <xs:element name="ObtenerContenidosNoPublicadosResponse" type="tns:ObtenerContenidosNoPublicadosResponse"/>
@@ -73,6 +77,48 @@
       <xs:element name="codProvincia" type="xs:string" minOccurs="0"/>
       <xs:element name="nomProvincia" type="xs:string" minOccurs="0"/>
     </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="CrearReservaDesdeRistorinoRequest">
+    <xs:sequence>
+      <xs:element name="CrearReservaDesdeRistorinoRequest" type="tns:crearReservaConClienteBean" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="crearReservaConClienteBean">
+    <xs:sequence>
+      <xs:element name="cliente" type="tns:clienteRestauranteBean" minOccurs="0"/>
+      <xs:element name="reserva" type="tns:reservaSucursalBean" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="clienteRestauranteBean">
+    <xs:sequence>
+      <xs:element name="apellido" type="xs:string" minOccurs="0"/>
+      <xs:element name="correo" type="xs:string" minOccurs="0"/>
+      <xs:element name="nombre" type="xs:string" minOccurs="0"/>
+      <xs:element name="nroCliente" type="xs:int" minOccurs="0"/>
+      <xs:element name="telefonos" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="reservaSucursalBean">
+    <xs:sequence>
+      <xs:element name="cantAdultos" type="xs:int" minOccurs="0"/>
+      <xs:element name="cantMenores" type="xs:int" minOccurs="0"/>
+      <xs:element name="codReserva" type="xs:string" minOccurs="0"/>
+      <xs:element name="codZona" type="xs:string" minOccurs="0"/>
+      <xs:element name="costoReserva" type="xs:double" minOccurs="0"/>
+      <xs:element name="fechaReserva" type="xs:string" minOccurs="0"/>
+      <xs:element name="horaReserva" type="xs:string" minOccurs="0"/>
+      <xs:element name="nroCliente" type="xs:int" minOccurs="0"/>
+      <xs:element name="nroRestaurante" type="xs:int" minOccurs="0"/>
+      <xs:element name="nroSucursal" type="xs:int" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="CrearReservaDesdeRistorinoResponse">
+    <xs:sequence/>
   </xs:complexType>
 
   <xs:complexType name="ObtenerContenidosNoPublicadosRequest">

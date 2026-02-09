@@ -24,6 +24,12 @@
   <message name="ObtenerContenidosNoPublicadosResponse">
     <part name="parameters" element="tns:ObtenerContenidosNoPublicadosResponse"/>
   </message>
+  <message name="CrearReservaDesdeRistorino">
+    <part name="parameters" element="tns:CrearReservaDesdeRistorinoRequest"/>
+  </message>
+  <message name="CrearReservaDesdeRistorinoResponse">
+    <part name="parameters" element="tns:CrearReservaDesdeRistorinoResponse"/>
+  </message>
   <message name="ActualizarReservaCliente">
     <part name="parameters" element="tns:ActualizarReservaClienteRequest"/>
   </message>
@@ -42,6 +48,10 @@
     <operation name="ObtenerContenidosNoPublicados">
       <input wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/ObtenerContenidosNoPublicadosRequest" message="tns:ObtenerContenidosNoPublicados"/>
       <output wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/ObtenerContenidosNoPublicadosResponse" message="tns:ObtenerContenidosNoPublicadosResponse"/>
+    </operation>
+    <operation name="CrearReservaDesdeRistorino">
+      <input wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/CrearReservaDesdeRistorinoRequest" message="tns:CrearReservaDesdeRistorino"/>
+      <output wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/CrearReservaDesdeRistorinoResponse" message="tns:CrearReservaDesdeRistorinoResponse"/>
     </operation>
     <operation name="ActualizarReservaCliente">
       <input wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/ActualizarReservaClienteRequest" message="tns:ActualizarReservaCliente"/>
@@ -69,6 +79,15 @@
       </output>
     </operation>
     <operation name="ObtenerContenidosNoPublicados">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+    <operation name="CrearReservaDesdeRistorino">
       <soap:operation soapAction=""/>
       <input>
         <soap:body use="literal"/>
