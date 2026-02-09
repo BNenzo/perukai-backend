@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <xs:schema version="1.0" targetNamespace="http://services.perukai.das.ubp.edu.ar/" xmlns:tns="http://services.perukai.das.ubp.edu.ar/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
+  <xs:element name="ActualizarReservaClienteRequest" type="tns:ActualizarReservaClienteRequest"/>
+
+  <xs:element name="ActualizarReservaClienteResponse" type="tns:ActualizarReservaClienteResponse"/>
+
   <xs:element name="CrearReservaDesdeRistorinoRequest" type="tns:CrearReservaDesdeRistorinoRequest"/>
 
   <xs:element name="CrearReservaDesdeRistorinoResponse" type="tns:CrearReservaDesdeRistorinoResponse"/>
@@ -16,6 +20,26 @@
   <xs:element name="RegistrarClickContenidoRequest" type="tns:RegistrarClickContenidoRequest"/>
 
   <xs:element name="RegistrarClickContenidoResponse" type="tns:RegistrarClickContenidoResponse"/>
+
+  <xs:complexType name="ActualizarReservaClienteRequest">
+    <xs:sequence>
+      <xs:element name="ActualizarReservaClienteRequest" type="tns:actualizarReservaClienteRequestBean" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="actualizarReservaClienteRequestBean">
+    <xs:sequence>
+      <xs:element name="cantAdultos" type="xs:int" minOccurs="0"/>
+      <xs:element name="codReservaSucursal" type="xs:string" minOccurs="0"/>
+      <xs:element name="fechaCancelacion" type="xs:string" minOccurs="0"/>
+      <xs:element name="fechaReserva" type="xs:string" minOccurs="0"/>
+      <xs:element name="horaReserva" type="xs:string" minOccurs="0"/>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="ActualizarReservaClienteResponse">
+    <xs:sequence/>
+  </xs:complexType>
 
   <xs:complexType name="RegistrarClickContenidoRequest">
     <xs:sequence>
