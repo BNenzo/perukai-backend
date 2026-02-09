@@ -1,11 +1,17 @@
 package ar.edu.ubp.das.perukai.endpoint;
 
 import ar.edu.ubp.das.perukai.beans.ClicksContenidosRestaurantesBean;
+import ar.edu.ubp.das.perukai.beans.ContenidoNoPublicadoBean;
+import ar.edu.ubp.das.perukai.beans.CrearReservaConClienteBean;
 import ar.edu.ubp.das.perukai.beans.ProvinciaBean;
 import ar.edu.ubp.das.perukai.services.PerukaiWS;
 import ar.edu.ubp.das.perukai.services.jaxws.ObtenerProvinciasResponse;
 import ar.edu.ubp.das.perukai.services.jaxws.RegistrarClickContenido;
 import ar.edu.ubp.das.perukai.services.jaxws.RegistrarClickContenidoResponse;
+import ar.edu.ubp.das.perukai.services.jaxws.CrearReservaDesdeRistorino;
+import ar.edu.ubp.das.perukai.services.jaxws.CrearReservaDesdeRistorinoResponse;
+import ar.edu.ubp.das.perukai.services.jaxws.ObtenerContenidosNoPublicados;
+import ar.edu.ubp.das.perukai.services.jaxws.ObtenerContenidosNoPublicadosResponse;
 import ar.edu.ubp.das.perukai.services.jaxws.ObtenerProvincias;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,4 +49,26 @@ public class PerukaiEndpoint {
     perukaiService.registrarClickContenido(click);
     return new RegistrarClickContenidoResponse();
   }
+
+  // OBTENER CONTENIDOS NO PUBLICADOS
+  @PayloadRoot(namespace = NAMESPACE_URI, localPart = "ObtenerContenidosNoPublicadosRequest")
+  @ResponsePayload
+  public ObtenerContenidosNoPublicadosResponse obtenerContenidosNoPublicados(
+      @RequestPayload ObtenerContenidosNoPublicados request) {
+    List<ContenidoNoPublicadoBean> contenidosNoPublicados = perukaiService.obtenerContenidosNoPublicados();
+    ObtenerContenidosNoPublicadosResponse response = new ObtenerContenidosNoPublicadosResponse();
+    response.setContenidosNoPublicadosResponse(contenidosNoPublicados);
+    return response;
+  }
+
+  // CREAR RESERVA EN UNA SUCURSAL
+  @PayloadRoot(namespace = NAMESPACE_URI, localPart = "CrearReservaDesdeRistorinoRequest")
+  @ResponsePayload
+  public CrearReservaDesdeRistorinoResponse crearReservaDesdeRistorino(
+      @RequestPayload CrearReservaDesdeRistorino request) {
+    CrearReservaConClienteBean reserva = request.getCrearReservaDesdeRistorinoRequest();
+    perukaiService.crearReservaDesdeRistorino(reserva);
+    return new CrearReservaDesdeRistorinoResponse();
+  }
+
 }
