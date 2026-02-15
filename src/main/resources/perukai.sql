@@ -129,7 +129,8 @@ INSERT INTO zonas (cod_zona, nom_zona) VALUES
 ('VILLP','Villa Páez'),
 ('SAGU','San Gerónimo'),
 ('LOSGL','Los Gigantes'),
-('BAJO','Bajo Alberdi');
+('BAJO','Bajo Alberdi'),
+('GUE','Güemes');
 
 
 CREATE TABLE zonas_sucursales (
@@ -145,7 +146,7 @@ CREATE TABLE zonas_sucursales (
     FOREIGN KEY (cod_zona) REFERENCES zonas (cod_zona)
 );
 
-INSERT INTO zonas_sucursales VALUES (1,1,'NCBA',50,1,1), (1,2,'CTR',45,1,1);
+INSERT INTO zonas_sucursales VALUES (1,1,'NCBA',50,1,1), (1,2,'GUE',45,1,1);
 
 CREATE TABLE turnos_sucursales (
     nro_restaurante INT NOT NULL,
@@ -181,8 +182,8 @@ CREATE TABLE zonas_turnos_sucursales (
 INSERT INTO zonas_turnos_sucursales VALUES
 (1,1,'12:00','NCBA',1),
 (1,1,'20:00','NCBA',1),
-(1,2,'12:00','CTR',1),
-(1,2,'20:00','CTR',1);
+(1,2,'12:00','GUE',1),
+(1,2,'20:00','GUE',1);
 
 CREATE TABLE clientes (
     nro_cliente INT PRIMARY KEY,
@@ -218,9 +219,9 @@ CREATE TABLE reservas_sucursales (
         REFERENCES zonas_turnos_sucursales (nro_restaurante, nro_sucursal, cod_zona, hora_desde)
 );
 
-INSERT INTO reservas_sucursales VALUES
-('PERUKAI-001-R001','2025-11-02 18:30:00',1,'2025-11-05',1,1,'NCBA','12:00',2,0,12000.00,0,NULL),
-('PERUKAI-001-R002','2025-11-02 18:45:00',2,'2025-11-05',1,1,'NCBA','20:00',4,2,18000.00,0,NULL);
+-- INSERT INTO reservas_sucursales VALUES
+-- ('PERUKAI-001-R001','2025-11-02 18:30:00',1,'2025-11-05',1,1,'NCBA','12:00',2,0,12000.00,0,NULL),
+-- ('PERUKAI-001-R002','2025-11-02 18:45:00',2,'2025-11-05',1,1,'NCBA','20:00',4,2,18000.00,0,NULL);
 
 CREATE TABLE estilos (
     nro_estilo INT PRIMARY KEY,
@@ -290,8 +291,8 @@ CREATE TABLE tipos_comidas_sucursales (
 );
 
 INSERT INTO tipos_comidas_sucursales VALUES
-(1,1,14,1),
-(1,2,14,1);
+(1,1,11,1),
+(1,2,11,1);
 
 CREATE TABLE especialidades_alimentarias (
     nro_restriccion INT PRIMARY KEY,
@@ -320,7 +321,7 @@ CREATE TABLE especialidades_alimentarias_sucursales (
 );
 
 INSERT INTO especialidades_alimentarias_sucursales VALUES
-(1,1,1,1),(1,2,3,1);
+(1,1,1,1),(1,2,1,1);
 
 CREATE TABLE contenidos (
     nro_restaurante INT NOT NULL,
@@ -337,8 +338,8 @@ CREATE TABLE contenidos (
 );
 
 INSERT INTO contenidos VALUES
-(1,1,'Maki Acevichado','https://www.grupolegovic.com/wp-content/uploads/2022/04/makis-acevichados.jpg',1,37.00,1),
-(1,2,'Pulpo al olivo','https://imag.bonviveur.com/pulpo-al-olivo.jpg',1,40.50,1),
+(1,1,'Maki Acevichado','https://www.grupolegovic.com/wp-content/uploads/2022/04/makis-acevichados.jpg',0,37.00,1),
+(1,2,'Pulpo al olivo','https://imag.bonviveur.com/pulpo-al-olivo.jpg',0,40.50,1),
 (1,3,'Ceviche Nikkei','https://static.wixstatic.com/media/f50a6c_55fcd867d0554e4a804e4ba98b8c11dc~mv2.jpg/v1/fill/w_980,h_849,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/f50a6c_55fcd867d0554e4a804e4ba98b8c11dc~mv2.jpg',0,50.00,1);
 
 CREATE TABLE clicks_contenidos (
