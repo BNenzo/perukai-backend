@@ -564,5 +564,32 @@ BEGIN
 END;
 GO
 
+-- ACTUALIZAR LOS CONTENIDOS NO PUBLICADOS A PUBLICADOS
+CREATE OR ALTER PROCEDURE dbo.sp_actualizar_contenido_no_publicado
+  @json NVARCHAR(MAX)
+AS
+BEGIN
+  SET NOCOUNT ON;
+
+  ;WITH items AS (
+    SELECT
+      nroRestaurante,
+      nroContenido
+    FROM OPENJSON(@json)
+    WITH (
+      nroRestaurante INT '$.nroRestaurante',
+      nroContenido   INT '$.nroContenido'
+    )
+  )
+  UPDATE c
+     SET c.publicado = 1
+  FROM dbo.contenidos c
+  INNER JOIN items i
+    ON 1 = c.nro_restaurante
+   AND i.nroContenido   = c.nro_contenido;
+END
+GO
+
 EXEC dbo.sp_get_contenidos_no_publicados
 
+select * from contenidos

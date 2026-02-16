@@ -1,10 +1,14 @@
 package ar.edu.ubp.das.perukai.repositories;
 
+import ar.edu.ubp.das.perukai.beans.ActualizarContenidosNoPublicadosBean;
 import ar.edu.ubp.das.perukai.beans.ActualizarReservaClienteRequestBean;
 import ar.edu.ubp.das.perukai.beans.ClicksContenidosRestaurantesBean;
 import ar.edu.ubp.das.perukai.beans.ContenidoNoPublicadoBean;
 import ar.edu.ubp.das.perukai.beans.ProvinciaBean;
 import ar.edu.ubp.das.perukai.components.SimpleJdbcCallFactory;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.exc.JsonNodeException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
@@ -121,4 +125,20 @@ public class PerukaiRepository {
         "dbo",
         params);
   }
+
+  // ACTUALIZAR LOS CONTENIDOS NO PUBLICADOS A PUBLICADOS
+  public void actualizarContenidoPublicado(ActualizarContenidosNoPublicadosBean request)
+      throws JsonNodeException {
+    ObjectMapper om = new ObjectMapper();
+    String json = om.writeValueAsString(request.getContenidos());
+
+    MapSqlParameterSource params = new MapSqlParameterSource()
+        .addValue("json", json);
+
+    jdbcCallFactory.executeWithOutputs(
+        "sp_actualizar_contenido_no_publicado",
+        "dbo",
+        params);
+  }
+
 }

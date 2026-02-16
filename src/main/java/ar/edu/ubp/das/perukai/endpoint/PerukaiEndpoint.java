@@ -1,5 +1,6 @@
 package ar.edu.ubp.das.perukai.endpoint;
 
+import ar.edu.ubp.das.perukai.beans.ActualizarContenidosNoPublicadosBean;
 import ar.edu.ubp.das.perukai.beans.ActualizarReservaClienteRequestBean;
 import ar.edu.ubp.das.perukai.beans.ClicksContenidosRestaurantesBean;
 import ar.edu.ubp.das.perukai.beans.ContenidoNoPublicadoBean;
@@ -11,6 +12,8 @@ import ar.edu.ubp.das.perukai.services.jaxws.RegistrarClickContenido;
 import ar.edu.ubp.das.perukai.services.jaxws.RegistrarClickContenidoResponse;
 import ar.edu.ubp.das.perukai.services.jaxws.CrearReservaDesdeRistorino;
 import ar.edu.ubp.das.perukai.services.jaxws.CrearReservaDesdeRistorinoResponse;
+import ar.edu.ubp.das.perukai.services.jaxws.ActualizarContenidosNoPublicados;
+import ar.edu.ubp.das.perukai.services.jaxws.ActualizarContenidosNoPublicadosResponse;
 import ar.edu.ubp.das.perukai.services.jaxws.ActualizarReservaCliente;
 import ar.edu.ubp.das.perukai.services.jaxws.ActualizarReservaClienteResponse;
 import ar.edu.ubp.das.perukai.services.jaxws.ObtenerContenidosNoPublicados;
@@ -84,4 +87,14 @@ public class PerukaiEndpoint {
     return new ActualizarReservaClienteResponse();
   }
 
+  // ACTUALIZAR LOS CONTENIDOS NO PUBLICADOS A PUBLICADOS
+  @PayloadRoot(namespace = NAMESPACE_URI, localPart = "ActualizarContenidosNoPublicadosRequest")
+  @ResponsePayload
+  public ActualizarContenidosNoPublicadosResponse actualizarContenidosNoPublicados(
+      @RequestPayload ActualizarContenidosNoPublicados request) {
+    ActualizarContenidosNoPublicadosBean actualizarReservaCliente = request
+        .getActualizarContenidosNoPublicadosRequest();
+    perukaiService.ActualizarContenidosNoPublicados(actualizarReservaCliente);
+    return new ActualizarContenidosNoPublicadosResponse();
+  }
 }

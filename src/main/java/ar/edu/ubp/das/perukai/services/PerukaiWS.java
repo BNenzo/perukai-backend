@@ -1,5 +1,6 @@
 package ar.edu.ubp.das.perukai.services;
 
+import ar.edu.ubp.das.perukai.beans.ActualizarContenidosNoPublicadosBean;
 import ar.edu.ubp.das.perukai.beans.ActualizarReservaClienteRequestBean;
 import ar.edu.ubp.das.perukai.beans.ClicksContenidosRestaurantesBean;
 import ar.edu.ubp.das.perukai.beans.ContenidoNoPublicadoBean;
@@ -88,6 +89,16 @@ public class PerukaiWS {
   public void actualizarReservaCliente(
       @WebParam(name = "ActualizarReservaClienteRequest") ActualizarReservaClienteRequestBean body) {
     localidadesRepository.actualizarReservaCliente(body);
+  }
+
+  // ACTUALIZAR LOS CONTENIDOS NO PUBLICADOS A PUBLICADOS
+  @WebMethod(operationName = "ActualizarContenidosNoPublicados")
+  @RequestWrapper(localName = "ActualizarContenidosNoPublicadosRequest")
+  @ResponseWrapper(localName = "ActualizarContenidosNoPublicadosResponse")
+  @WebResult(name = "ContenidoNoPublicadosResponse")
+  public void ActualizarContenidosNoPublicados(
+      @WebParam(name = "ActualizarContenidosNoPublicadosRequest") ActualizarContenidosNoPublicadosBean body) {
+    localidadesRepository.actualizarContenidoPublicado(body);
   }
 
 }
