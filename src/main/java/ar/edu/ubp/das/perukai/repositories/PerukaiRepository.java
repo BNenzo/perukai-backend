@@ -1,11 +1,20 @@
 package ar.edu.ubp.das.perukai.repositories;
 
+import ar.edu.ubp.das.perukai.beans.ActualizarContenidosNoPublicadosBean;
+import ar.edu.ubp.das.perukai.beans.ActualizarReservaClienteRequestBean;
 import ar.edu.ubp.das.perukai.beans.ClicksContenidosRestaurantesBean;
+import ar.edu.ubp.das.perukai.beans.ContenidoNoPublicadoBean;
 import ar.edu.ubp.das.perukai.beans.ProvinciaBean;
 import ar.edu.ubp.das.perukai.components.SimpleJdbcCallFactory;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.exc.JsonNodeException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @Repository
@@ -29,4 +38,107 @@ public class PerukaiRepository {
 
     jdbcCallFactory.executeWithOutputs("sp_insert_click_contenido", "dbo", p);
   }
+
+  // OBTENER CONTENIDOS NO PUBLICADOS
+  public List<ContenidoNoPublicadoBean> getContenidosNoPublicados() {
+    MapSqlParameterSource p = new MapSqlParameterSource();
+
+    return jdbcCallFactory.executeQuery(
+        "sp_get_contenidos_no_publicados",
+        "dbo",
+        p,
+        "contenidos_no_publicados",
+        ContenidoNoPublicadoBean.class);
+  }
+
+  // ===============================
+  // INSERT CLIENTE DESDE RISTORINO
+  // ===============================
+  public void insertarClienteDesdeRistorino(
+      Integer nroCliente,
+      String apellido,
+      String nombre,
+      String correo,
+      String telefonos) {
+
+    MapSqlParameterSource p = new MapSqlParameterSource()
+        .addValue("nro_cliente", nroCliente)
+        .addValue("apellido", apellido)
+        .addValue("nombre", nombre)
+        .addValue("correo", correo)
+        .addValue("telefonos", telefonos);
+
+    jdbcCallFactory.execute(
+        "sp_insert_cliente_desde_ristorino",
+        "dbo",
+        p);
+  }
+
+  // ===============================
+  // INSERT RESERVA DESDE RISTORINO
+  // ===============================
+  public void crearReservaSucursal(
+      String codReserva,
+      Integer nroCliente,
+      LocalDate fechaReserva,
+      Integer nroRestaurante,
+      Integer nroSucursal,
+      String codZona,
+      LocalTime horaReserva,
+      Integer cantAdultos,
+      Integer cantMenores,
+      Double costoReserva) {
+
+    System.out.println(fechaReserva);
+    System.out.println(horaReserva);
+    System.out.println(codZona);
+    MapSqlParameterSource p = new MapSqlParameterSource()
+        .addValue("cod_reserva", codReserva)
+        .addValue("nro_cliente", nroCliente)
+        .addValue("fecha_reserva", fechaReserva)
+        .addValue("nro_restaurante", nroRestaurante)
+        .addValue("nro_sucursal", nroSucursal)
+        .addValue("cod_zona", codZona)
+        .addValue("hora_reserva", horaReserva)
+        .addValue("cant_adultos", cantAdultos)
+        .addValue("cant_menores", cantMenores)
+        .addValue("costo_reserva", costoReserva);
+
+    jdbcCallFactory.execute(
+        "sp_crear_reserva_sucursal",
+        "dbo",
+        p);
+  }
+
+  // ACTUALIZAR LA RESERVA DE UN CLIENTE
+  public void actualizarReservaCliente(ActualizarReservaClienteRequestBean request) {
+    MapSqlParameterSource params = new MapSqlParameterSource()
+        .addValue("cod_reserva", request.getCodReservaSucursal())
+        .addValue("cant_adultos", request.getCantAdultos())
+        .addValue("fecha_reserva", request.getFechaReserva())
+        .addValue("hora_reserva", request.getHoraReserva())
+        .addValue("fecha_cancelacion", request.getFechaCancelacion())
+        .addValue("cancelada", request.getFechaCancelacion() != null ? 1 : null);
+
+    jdbcCallFactory.executeWithOutputs(
+        "sp_actualizar_reserva_cliente",
+        "dbo",
+        params);
+  }
+
+  // ACTUALIZAR LOS CONTENIDOS NO PUBLICADOS A PUBLICADOS
+  public void actualizarContenidoPublicado(ActualizarContenidosNoPublicadosBean request)
+      throws JsonNodeException {
+    ObjectMapper om = new ObjectMapper();
+    String json = om.writeValueAsString(request.getContenidos());
+
+    MapSqlParameterSource params = new MapSqlParameterSource()
+        .addValue("json", json);
+
+    jdbcCallFactory.executeWithOutputs(
+        "sp_actualizar_contenido_no_publicado",
+        "dbo",
+        params);
+  }
+
 }

@@ -129,7 +129,8 @@ INSERT INTO zonas (cod_zona, nom_zona) VALUES
 ('VILLP','Villa Páez'),
 ('SAGU','San Gerónimo'),
 ('LOSGL','Los Gigantes'),
-('BAJO','Bajo Alberdi');
+('BAJO','Bajo Alberdi'),
+('GUE','Güemes');
 
 
 CREATE TABLE zonas_sucursales (
@@ -145,7 +146,7 @@ CREATE TABLE zonas_sucursales (
     FOREIGN KEY (cod_zona) REFERENCES zonas (cod_zona)
 );
 
-INSERT INTO zonas_sucursales VALUES (1,1,'NCBA',50,1,1), (1,2,'CTR',45,1,1);
+INSERT INTO zonas_sucursales VALUES (1,1,'NCBA',50,1,1), (1,2,'GUE',45,1,1);
 
 CREATE TABLE turnos_sucursales (
     nro_restaurante INT NOT NULL,
@@ -181,8 +182,8 @@ CREATE TABLE zonas_turnos_sucursales (
 INSERT INTO zonas_turnos_sucursales VALUES
 (1,1,'12:00','NCBA',1),
 (1,1,'20:00','NCBA',1),
-(1,2,'12:00','CTR',1),
-(1,2,'20:00','CTR',1);
+(1,2,'12:00','GUE',1),
+(1,2,'20:00','GUE',1);
 
 CREATE TABLE clientes (
     nro_cliente INT PRIMARY KEY,
@@ -218,9 +219,9 @@ CREATE TABLE reservas_sucursales (
         REFERENCES zonas_turnos_sucursales (nro_restaurante, nro_sucursal, cod_zona, hora_desde)
 );
 
-INSERT INTO reservas_sucursales VALUES
-('LFB-001-R001','2025-11-02 18:30:00',1,'2025-11-05',1,1,'NCBA','12:00',2,0,12000.00,0,NULL),
-('LFB-001-R002','2025-11-02 18:45:00',2,'2025-11-05',1,1,'NCBA','20:00',4,2,18000.00,0,NULL);
+-- INSERT INTO reservas_sucursales VALUES
+-- ('PERUKAI-001-R001','2025-11-02 18:30:00',1,'2025-11-05',1,1,'NCBA','12:00',2,0,12000.00,0,NULL),
+-- ('PERUKAI-001-R002','2025-11-02 18:45:00',2,'2025-11-05',1,1,'NCBA','20:00',4,2,18000.00,0,NULL);
 
 CREATE TABLE estilos (
     nro_estilo INT PRIMARY KEY,
@@ -290,8 +291,8 @@ CREATE TABLE tipos_comidas_sucursales (
 );
 
 INSERT INTO tipos_comidas_sucursales VALUES
-(1,1,14,1),
-(1,2,14,1);
+(1,1,11,1),
+(1,2,11,1);
 
 CREATE TABLE especialidades_alimentarias (
     nro_restriccion INT PRIMARY KEY,
@@ -320,7 +321,7 @@ CREATE TABLE especialidades_alimentarias_sucursales (
 );
 
 INSERT INTO especialidades_alimentarias_sucursales VALUES
-(1,1,1,1),(1,2,3,1);
+(1,1,1,1),(1,2,1,1);
 
 CREATE TABLE contenidos (
     nro_restaurante INT NOT NULL,
@@ -337,8 +338,8 @@ CREATE TABLE contenidos (
 );
 
 INSERT INTO contenidos VALUES
-(1,1,'Maki Acevichado','https://www.grupolegovic.com/wp-content/uploads/2022/04/makis-acevichados.jpg',1,37.00,1),
-(1,2,'Pulpo al olivo','https://imag.bonviveur.com/pulpo-al-olivo.jpg',1,40.50,1),
+(1,1,'Maki Acevichado','https://www.grupolegovic.com/wp-content/uploads/2022/04/makis-acevichados.jpg',0,37.00,1),
+(1,2,'Pulpo al olivo','https://imag.bonviveur.com/pulpo-al-olivo.jpg',0,40.50,1),
 (1,3,'Ceviche Nikkei','https://static.wixstatic.com/media/f50a6c_55fcd867d0554e4a804e4ba98b8c11dc~mv2.jpg/v1/fill/w_980,h_849,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/f50a6c_55fcd867d0554e4a804e4ba98b8c11dc~mv2.jpg',0,50.00,1);
 
 CREATE TABLE clicks_contenidos (
@@ -417,4 +418,178 @@ END;
 GO
 
 
-SELECT * from clicks_contenidos;
+
+-- OBTENER CONTENIDOS NO PUBLICADOS
+CREATE OR ALTER PROCEDURE sp_get_contenidos_no_publicados
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        nro_restaurante,
+        nro_contenido,
+        contenido_a_publicar,
+        imagen_a_publicar,
+        publicado,
+        costo_click,
+        nro_sucursal
+    FROM contenidos
+    WHERE publicado = 0;
+END
+GO
+
+
+-- INSERT CLIENTE DESDE RISTORINO SOLO SI NO EXISTE
+CREATE OR ALTER PROCEDURE sp_insert_cliente_desde_ristorino
+  @nro_cliente INT,
+  @apellido VARCHAR(100),
+  @nombre VARCHAR(100),
+  @correo VARCHAR(150),
+  @telefonos VARCHAR(50)
+AS
+BEGIN
+  SET NOCOUNT ON;
+
+  IF NOT EXISTS (
+    SELECT 1
+    FROM clientes
+    WHERE nro_cliente = @nro_cliente
+  )
+  BEGIN
+    INSERT INTO clientes (
+      nro_cliente,
+      apellido,
+      nombre,
+      correo,
+      telefonos
+    )
+    VALUES (
+      @nro_cliente,
+      @apellido,
+      @nombre,
+      @correo,
+      @telefonos
+    );
+  END
+END;
+GO
+
+
+-- INSERT DE UN TURNO
+CREATE OR ALTER PROCEDURE sp_crear_reserva_sucursal
+  @cod_reserva VARCHAR(50),
+  @nro_cliente INT,
+  @fecha_reserva DATE,
+  @nro_restaurante INT,
+  @nro_sucursal INT,
+  @cod_zona CHAR(5),
+  @hora_reserva TIME,
+  @cant_adultos INT,
+  @cant_menores INT,
+  @costo_reserva DECIMAL(10,2)
+AS
+BEGIN
+  SET NOCOUNT ON;
+
+  INSERT INTO reservas_sucursales (
+    cod_reserva,
+    fecha_hora_registro,
+    nro_cliente,
+    fecha_reserva,
+    nro_restaurante,
+    nro_sucursal,
+    cod_zona,
+    hora_reserva,
+    cant_adultos,
+    cant_menores,
+    costo_reserva,
+    cancelada,
+    fecha_cancelacion
+  )
+  VALUES (
+    @cod_reserva,
+    CURRENT_TIMESTAMP,
+    @nro_cliente,
+    @fecha_reserva,
+    @nro_restaurante,
+    @nro_sucursal,
+    @cod_zona,
+    @hora_reserva,
+    @cant_adultos,
+    @cant_menores,
+    @costo_reserva,
+    0,
+    NULL
+  );
+END;
+GO
+
+
+-- ACTUALIZAR LA RESERVA DE UN CLIENTE
+CREATE OR ALTER PROCEDURE dbo.sp_actualizar_reserva_cliente
+    @cod_reserva   VARCHAR(50),
+    @fecha_reserva DATE,
+    @hora_reserva  TIME,
+    @cant_adultos  INT,
+    @fecha_cancelacion DATE,
+    @cancelada INT = NULL
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    BEGIN TRY
+        BEGIN TRAN;
+
+        -- Actualización
+        UPDATE rs
+        SET
+            rs.fecha_reserva = COALESCE(@fecha_reserva, rs.fecha_reserva),
+            rs.hora_reserva  = COALESCE(@hora_reserva, rs.hora_reserva),
+            rs.cant_adultos  = COALESCE(@cant_adultos, rs.cant_adultos),
+            rs.fecha_cancelacion  = COALESCE(@fecha_cancelacion, rs.fecha_cancelacion),
+            rs.cancelada  = COALESCE(@cancelada, rs.cancelada)
+        FROM dbo.reservas_sucursales AS rs
+        WHERE cod_reserva = @cod_reserva;
+
+        -- Si no existe la reserva
+        IF @@ROWCOUNT = 0
+            THROW 50002, 'No existe una reserva con ese cod_reserva.', 1;
+
+        COMMIT TRAN;
+    END TRY
+    BEGIN CATCH
+        IF XACT_STATE() <> 0 ROLLBACK TRAN;
+        THROW;
+    END CATCH
+END;
+GO
+
+-- ACTUALIZAR LOS CONTENIDOS NO PUBLICADOS A PUBLICADOS
+CREATE OR ALTER PROCEDURE dbo.sp_actualizar_contenido_no_publicado
+  @json NVARCHAR(MAX)
+AS
+BEGIN
+  SET NOCOUNT ON;
+
+  ;WITH items AS (
+    SELECT
+      nroRestaurante,
+      nroContenido
+    FROM OPENJSON(@json)
+    WITH (
+      nroRestaurante INT '$.nroRestaurante',
+      nroContenido   INT '$.nroContenido'
+    )
+  )
+  UPDATE c
+     SET c.publicado = 1
+  FROM dbo.contenidos c
+  INNER JOIN items i
+    ON 1 = c.nro_restaurante
+   AND i.nroContenido   = c.nro_contenido;
+END
+GO
+
+EXEC dbo.sp_get_contenidos_no_publicados
+
+select * from contenidos
