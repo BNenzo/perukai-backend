@@ -34,6 +34,8 @@
   <xs:complexType name="actualizarReservaClienteRequestBean">
     <xs:sequence>
       <xs:element name="cantAdultos" type="xs:int" minOccurs="0"/>
+      <xs:element name="cantMenores" type="xs:int" minOccurs="0"/>
+      <xs:element name="codEstado" type="xs:int" minOccurs="0"/>
       <xs:element name="codReservaSucursal" type="xs:string" minOccurs="0"/>
       <xs:element name="fechaCancelacion" type="xs:string" minOccurs="0"/>
       <xs:element name="fechaReserva" type="xs:string" minOccurs="0"/>
