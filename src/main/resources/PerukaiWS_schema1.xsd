@@ -49,18 +49,7 @@
 
   <xs:complexType name="RegistrarClickContenidoRequest">
     <xs:sequence>
-      <xs:element name="ClicksContenidosRestaurantes" type="tns:clicksContenidosRestaurantesBean" minOccurs="0"/>
-    </xs:sequence>
-  </xs:complexType>
-
-  <xs:complexType name="clicksContenidosRestaurantesBean">
-    <xs:sequence>
-      <xs:element name="costoClick" type="xs:decimal" minOccurs="0"/>
-      <xs:element name="fechaHoraRegistro" type="xs:string" minOccurs="0"/>
-      <xs:element name="nroClick" type="xs:int"/>
-      <xs:element name="nroCliente" type="xs:int" minOccurs="0"/>
-      <xs:element name="nroContenido" type="xs:int"/>
-      <xs:element name="nroRestaurante" type="xs:int"/>
+      <xs:element name="Body" type="xs:string" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
 
@@ -87,25 +76,7 @@
 
   <xs:complexType name="ActualizarContenidosNoPublicadosRequest">
     <xs:sequence>
-      <xs:element name="ActualizarContenidosNoPublicadosRequest" type="tns:actualizarContenidosNoPublicadosBean" minOccurs="0"/>
-    </xs:sequence>
-  </xs:complexType>
-
-  <xs:complexType name="actualizarContenidosNoPublicadosBean">
-    <xs:sequence>
-      <xs:element name="contenidos" type="tns:contenidoNoPublicadoBean" nillable="true" minOccurs="0" maxOccurs="unbounded"/>
-    </xs:sequence>
-  </xs:complexType>
-
-  <xs:complexType name="contenidoNoPublicadoBean">
-    <xs:sequence>
-      <xs:element name="contenidoAPublicar" type="xs:string" minOccurs="0"/>
-      <xs:element name="costoClick" type="xs:decimal" minOccurs="0"/>
-      <xs:element name="imagenAPublicar" type="xs:string" minOccurs="0"/>
-      <xs:element name="nroContenido" type="xs:int"/>
-      <xs:element name="nroRestaurante" type="xs:int"/>
-      <xs:element name="nroSucursal" type="xs:int" minOccurs="0"/>
-      <xs:element name="publicado" type="xs:int"/>
+      <xs:element name="Body" type="xs:string" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
 
@@ -161,7 +132,7 @@
 
   <xs:complexType name="ObtenerContenidosNoPublicadosResponse">
     <xs:sequence>
-      <xs:element name="ContenidosNoPublicadosResponse" type="tns:contenidoNoPublicadoBean" minOccurs="0" maxOccurs="unbounded"/>
+      <xs:element name="SoapStringResponse" type="xs:string" minOccurs="0"/>
     </xs:sequence>
   </xs:complexType>
 </xs:schema>

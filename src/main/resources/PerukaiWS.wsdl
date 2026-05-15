@@ -18,12 +18,6 @@
   <message name="RegistrarClickContenidoResponse">
     <part name="parameters" element="tns:RegistrarClickContenidoResponse"/>
   </message>
-  <message name="ObtenerContenidosNoPublicados">
-    <part name="parameters" element="tns:ObtenerContenidosNoPublicadosRequest"/>
-  </message>
-  <message name="ObtenerContenidosNoPublicadosResponse">
-    <part name="parameters" element="tns:ObtenerContenidosNoPublicadosResponse"/>
-  </message>
   <message name="CrearReservaDesdeRistorino">
     <part name="parameters" element="tns:CrearReservaDesdeRistorinoRequest"/>
   </message>
@@ -35,6 +29,12 @@
   </message>
   <message name="ActualizarReservaClienteResponse">
     <part name="parameters" element="tns:ActualizarReservaClienteResponse"/>
+  </message>
+  <message name="ObtenerContenidosNoPublicados">
+    <part name="parameters" element="tns:ObtenerContenidosNoPublicadosRequest"/>
+  </message>
+  <message name="ObtenerContenidosNoPublicadosResponse">
+    <part name="parameters" element="tns:ObtenerContenidosNoPublicadosResponse"/>
   </message>
   <message name="ActualizarContenidosNoPublicados">
     <part name="parameters" element="tns:ActualizarContenidosNoPublicadosRequest"/>
@@ -51,10 +51,6 @@
       <input wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/RegistrarClickContenidoRequest" message="tns:RegistrarClickContenido"/>
       <output wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/RegistrarClickContenidoResponse" message="tns:RegistrarClickContenidoResponse"/>
     </operation>
-    <operation name="ObtenerContenidosNoPublicados">
-      <input wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/ObtenerContenidosNoPublicadosRequest" message="tns:ObtenerContenidosNoPublicados"/>
-      <output wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/ObtenerContenidosNoPublicadosResponse" message="tns:ObtenerContenidosNoPublicadosResponse"/>
-    </operation>
     <operation name="CrearReservaDesdeRistorino">
       <input wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/CrearReservaDesdeRistorinoRequest" message="tns:CrearReservaDesdeRistorino"/>
       <output wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/CrearReservaDesdeRistorinoResponse" message="tns:CrearReservaDesdeRistorinoResponse"/>
@@ -62,6 +58,10 @@
     <operation name="ActualizarReservaCliente">
       <input wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/ActualizarReservaClienteRequest" message="tns:ActualizarReservaCliente"/>
       <output wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/ActualizarReservaClienteResponse" message="tns:ActualizarReservaClienteResponse"/>
+    </operation>
+    <operation name="ObtenerContenidosNoPublicados">
+      <input wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/ObtenerContenidosNoPublicadosRequest" message="tns:ObtenerContenidosNoPublicados"/>
+      <output wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/ObtenerContenidosNoPublicadosResponse" message="tns:ObtenerContenidosNoPublicadosResponse"/>
     </operation>
     <operation name="ActualizarContenidosNoPublicados">
       <input wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/ActualizarContenidosNoPublicadosRequest" message="tns:ActualizarContenidosNoPublicados"/>
@@ -88,15 +88,6 @@
         <soap:body use="literal"/>
       </output>
     </operation>
-    <operation name="ObtenerContenidosNoPublicados">
-      <soap:operation soapAction=""/>
-      <input>
-        <soap:body use="literal"/>
-      </input>
-      <output>
-        <soap:body use="literal"/>
-      </output>
-    </operation>
     <operation name="CrearReservaDesdeRistorino">
       <soap:operation soapAction=""/>
       <input>
@@ -107,6 +98,15 @@
       </output>
     </operation>
     <operation name="ActualizarReservaCliente">
+      <soap:operation soapAction=""/>
+      <input>
+        <soap:body use="literal"/>
+      </input>
+      <output>
+        <soap:body use="literal"/>
+      </output>
+    </operation>
+    <operation name="ObtenerContenidosNoPublicados">
       <soap:operation soapAction=""/>
       <input>
         <soap:body use="literal"/>
