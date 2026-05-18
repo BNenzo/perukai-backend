@@ -1,9 +1,7 @@
 package ar.edu.ubp.das.perukai.endpoint;
 
-import ar.edu.ubp.das.perukai.beans.ActualizarContenidosNoPublicadosBean;
 import ar.edu.ubp.das.perukai.beans.ActualizarReservaClienteRequestBean;
 import ar.edu.ubp.das.perukai.beans.ClicksContenidosRestaurantesBean;
-import ar.edu.ubp.das.perukai.beans.ContenidoNoPublicadoBean;
 import ar.edu.ubp.das.perukai.beans.CrearReservaConClienteBean;
 import ar.edu.ubp.das.perukai.beans.ProvinciaBean;
 import ar.edu.ubp.das.perukai.services.PerukaiWS;
@@ -51,8 +49,8 @@ public class PerukaiEndpoint {
   @PayloadRoot(namespace = NAMESPACE_URI, localPart = "RegistrarClickContenidoRequest")
   @ResponsePayload
   public RegistrarClickContenidoResponse insertarLocalidad(@RequestPayload RegistrarClickContenido request) {
-    ClicksContenidosRestaurantesBean click = request.getClicksContenidosRestaurantes();
-    perukaiService.registrarClickContenido(click);
+    String body = request.getBody();
+    perukaiService.registrarClickContenido(body);
     return new RegistrarClickContenidoResponse();
   }
 
@@ -61,9 +59,9 @@ public class PerukaiEndpoint {
   @ResponsePayload
   public ObtenerContenidosNoPublicadosResponse obtenerContenidosNoPublicados(
       @RequestPayload ObtenerContenidosNoPublicados request) {
-    List<ContenidoNoPublicadoBean> contenidosNoPublicados = perukaiService.obtenerContenidosNoPublicados();
+    String responseString = perukaiService.obtenerContenidosNoPublicados();
     ObtenerContenidosNoPublicadosResponse response = new ObtenerContenidosNoPublicadosResponse();
-    response.setContenidosNoPublicadosResponse(contenidosNoPublicados);
+    response.setSoapStringResponse(responseString);
     return response;
   }
 
@@ -87,14 +85,13 @@ public class PerukaiEndpoint {
     return new ActualizarReservaClienteResponse();
   }
 
-  // ACTUALIZAR LOS CONTENIDOS NO PUBLICADOS A PUBLICADOS
+  // // ACTUALIZAR LOS CONTENIDOS NO PUBLICADOS A PUBLICADOS
   @PayloadRoot(namespace = NAMESPACE_URI, localPart = "ActualizarContenidosNoPublicadosRequest")
   @ResponsePayload
   public ActualizarContenidosNoPublicadosResponse actualizarContenidosNoPublicados(
       @RequestPayload ActualizarContenidosNoPublicados request) {
-    ActualizarContenidosNoPublicadosBean actualizarReservaCliente = request
-        .getActualizarContenidosNoPublicadosRequest();
-    perukaiService.ActualizarContenidosNoPublicados(actualizarReservaCliente);
+    String body = request.getBody();
+    perukaiService.ActualizarContenidosNoPublicados(body);
     return new ActualizarContenidosNoPublicadosResponse();
   }
 }

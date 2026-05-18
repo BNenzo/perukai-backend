@@ -115,6 +115,7 @@ public class PerukaiRepository {
     MapSqlParameterSource params = new MapSqlParameterSource()
         .addValue("cod_reserva", request.getCodReservaSucursal())
         .addValue("cant_adultos", request.getCantAdultos())
+        .addValue("cant_menores", request.getCantMenores())
         .addValue("fecha_reserva", request.getFechaReserva())
         .addValue("hora_reserva", request.getHoraReserva())
         .addValue("fecha_cancelacion", request.getFechaCancelacion())

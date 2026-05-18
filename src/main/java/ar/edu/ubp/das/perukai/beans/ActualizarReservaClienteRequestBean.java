@@ -4,9 +4,27 @@ public class ActualizarReservaClienteRequestBean {
 
   private String fechaReserva;
   private Integer cantAdultos;
+  private Integer cantMenores;
+  private Integer codEstado;
   private String horaReserva;
   private String codReservaSucursal;
   private String fechaCancelacion;
+
+  public Integer getCantMenores() {
+    return cantMenores;
+  }
+
+  public void setCantMenores(Integer cantMenores) {
+    this.cantMenores = cantMenores;
+  }
+
+  public Integer getCodEstado() {
+    return codEstado;
+  }
+
+  public void setCodEstado(Integer codEstado) {
+    this.codEstado = codEstado;
+  }
 
   public String getFechaCancelacion() {
     return fechaCancelacion;

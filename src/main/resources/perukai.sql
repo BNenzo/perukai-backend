@@ -170,8 +170,8 @@ INSERT INTO turnos_sucursales VALUES
 CREATE TABLE zonas_turnos_sucursales (
     nro_restaurante INT NOT NULL,
     nro_sucursal INT NOT NULL,
-    hora_desde TIME NOT NULL,
     cod_zona CHAR(5) NOT NULL,
+    hora_desde TIME NOT NULL,
     permite_menores INT NOT NULL DEFAULT 1,
     PRIMARY KEY (nro_restaurante, nro_sucursal, cod_zona, hora_desde),
     FOREIGN KEY (nro_restaurante, nro_sucursal, hora_desde)
@@ -180,10 +180,10 @@ CREATE TABLE zonas_turnos_sucursales (
 );
 
 INSERT INTO zonas_turnos_sucursales VALUES
-(1,1,'12:00','NCBA',1),
-(1,1,'20:00','NCBA',1),
-(1,2,'12:00','GUE',1),
-(1,2,'20:00','GUE',1);
+(1,1,'NCBA','12:00',1),
+(1,1,'NCBA','20:00',1),
+(1,2,'GUE','12:00',1),
+(1,2,'GUE','20:00',1);
 
 CREATE TABLE clientes (
     nro_cliente INT PRIMARY KEY,
@@ -527,12 +527,13 @@ GO
 
 -- ACTUALIZAR LA RESERVA DE UN CLIENTE
 CREATE OR ALTER PROCEDURE dbo.sp_actualizar_reserva_cliente
-    @cod_reserva   VARCHAR(50),
-    @fecha_reserva DATE,
-    @hora_reserva  TIME,
-    @cant_adultos  INT,
-    @fecha_cancelacion DATE,
-    @cancelada INT = NULL
+    @cod_reserva        VARCHAR(50),
+    @fecha_reserva      DATE = NULL,
+    @hora_reserva       TIME = NULL,
+    @cant_adultos       INT = NULL,
+    @cant_menores       INT = NULL,
+    @fecha_cancelacion  DATE = NULL,
+    @cancelada          INT = NULL
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -540,25 +541,32 @@ BEGIN
     BEGIN TRY
         BEGIN TRAN;
 
-        -- Actualización
+        IF NOT EXISTS (
+            SELECT 1
+            FROM dbo.reservas_sucursales
+            WHERE cod_reserva = @cod_reserva
+        )
+        BEGIN
+            ;THROW 50002, 'No existe una reserva con ese cod_reserva.', 1;
+        END
+
         UPDATE rs
         SET
-            rs.fecha_reserva = COALESCE(@fecha_reserva, rs.fecha_reserva),
-            rs.hora_reserva  = COALESCE(@hora_reserva, rs.hora_reserva),
-            rs.cant_adultos  = COALESCE(@cant_adultos, rs.cant_adultos),
+            rs.fecha_reserva      = COALESCE(@fecha_reserva, rs.fecha_reserva),
+            rs.hora_reserva       = COALESCE(@hora_reserva, rs.hora_reserva),
+            rs.cant_adultos       = COALESCE(@cant_adultos, rs.cant_adultos),
+            rs.cant_menores       = COALESCE(@cant_menores, rs.cant_menores),
             rs.fecha_cancelacion  = COALESCE(@fecha_cancelacion, rs.fecha_cancelacion),
-            rs.cancelada  = COALESCE(@cancelada, rs.cancelada)
+            rs.cancelada          = COALESCE(@cancelada, rs.cancelada)
         FROM dbo.reservas_sucursales AS rs
-        WHERE cod_reserva = @cod_reserva;
-
-        -- Si no existe la reserva
-        IF @@ROWCOUNT = 0
-            THROW 50002, 'No existe una reserva con ese cod_reserva.', 1;
+        WHERE rs.cod_reserva = @cod_reserva;
 
         COMMIT TRAN;
     END TRY
     BEGIN CATCH
-        IF XACT_STATE() <> 0 ROLLBACK TRAN;
+        IF XACT_STATE() <> 0
+            ROLLBACK TRAN;
+
         THROW;
     END CATCH
 END;
@@ -574,15 +582,19 @@ BEGIN
   ;WITH items AS (
     SELECT
       nroRestaurante,
-      nroContenido
+      nroContenido,
+      costoClick
     FROM OPENJSON(@json)
     WITH (
       nroRestaurante INT '$.nroRestaurante',
-      nroContenido   INT '$.nroContenido'
+      nroContenido   INT '$.nroContenido',
+      costoClick     DECIMAL(10,2) '$.costoClick'
     )
   )
   UPDATE c
-     SET c.publicado = 1
+     SET 
+        c.publicado = 1,
+        c.costo_click = COALESCE(i.costoClick, c.costo_click)
   FROM dbo.contenidos c
   INNER JOIN items i
     ON 1 = c.nro_restaurante

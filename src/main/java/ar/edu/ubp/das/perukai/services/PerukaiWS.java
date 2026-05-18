@@ -1,5 +1,7 @@
 package ar.edu.ubp.das.perukai.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import ar.edu.ubp.das.perukai.beans.ActualizarContenidosNoPublicadosBean;
 import ar.edu.ubp.das.perukai.beans.ActualizarReservaClienteRequestBean;
 import ar.edu.ubp.das.perukai.beans.ClicksContenidosRestaurantesBean;
@@ -13,6 +15,7 @@ import jakarta.jws.WebResult;
 import jakarta.jws.WebService;
 import jakarta.xml.ws.RequestWrapper;
 import jakarta.xml.ws.ResponseWrapper;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,17 +41,14 @@ public class PerukaiWS {
   @RequestWrapper(localName = "RegistrarClickContenidoRequest")
   @ResponseWrapper(localName = "RegistrarClickContenidoResponse")
   public void registrarClickContenido(
-      @WebParam(name = "ClicksContenidosRestaurantes") ClicksContenidosRestaurantesBean body) {
-    localidadesRepository.registrarClickContenido(body);
-  }
-
-  // OBTENER CONTENIDOS NO PUBLICADOS
-  @WebMethod(operationName = "ObtenerContenidosNoPublicados")
-  @RequestWrapper(localName = "ObtenerContenidosNoPublicadosRequest")
-  @ResponseWrapper(localName = "ObtenerContenidosNoPublicadosResponse")
-  @WebResult(name = "ContenidosNoPublicadosResponse")
-  public List<ContenidoNoPublicadoBean> obtenerContenidosNoPublicados() {
-    return localidadesRepository.getContenidosNoPublicados();
+      @WebParam(name = "Body") String body) {
+    try {
+      ObjectMapper mapper = new ObjectMapper();
+      ClicksContenidosRestaurantesBean bodyJson = mapper.readValue(body, ClicksContenidosRestaurantesBean.class);
+      localidadesRepository.registrarClickContenido(bodyJson);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException("Error al deserializar body", e);
+    }
   }
 
   @WebMethod(operationName = "CrearReservaDesdeRistorino")
@@ -91,14 +91,35 @@ public class PerukaiWS {
     localidadesRepository.actualizarReservaCliente(body);
   }
 
+  // OBTENER CONTENIDOS NO PUBLICADOS
+  @WebMethod(operationName = "ObtenerContenidosNoPublicados")
+  @RequestWrapper(localName = "ObtenerContenidosNoPublicadosRequest")
+  @ResponseWrapper(localName = "ObtenerContenidosNoPublicadosResponse")
+  @WebResult(name = "SoapStringResponse")
+  public String obtenerContenidosNoPublicados() {
+    List<ContenidoNoPublicadoBean> contenidos = localidadesRepository.getContenidosNoPublicados();
+    try {
+      ObjectMapper mapper = new ObjectMapper();
+      return mapper.writeValueAsString(contenidos);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException("Error al serializar contenidos", e);
+    }
+  }
+
   // ACTUALIZAR LOS CONTENIDOS NO PUBLICADOS A PUBLICADOS
   @WebMethod(operationName = "ActualizarContenidosNoPublicados")
   @RequestWrapper(localName = "ActualizarContenidosNoPublicadosRequest")
   @ResponseWrapper(localName = "ActualizarContenidosNoPublicadosResponse")
   @WebResult(name = "ContenidoNoPublicadosResponse")
   public void ActualizarContenidosNoPublicados(
-      @WebParam(name = "ActualizarContenidosNoPublicadosRequest") ActualizarContenidosNoPublicadosBean body) {
-    localidadesRepository.actualizarContenidoPublicado(body);
+      @WebParam(name = "Body") String body) {
+    try {
+      ObjectMapper mapper = new ObjectMapper();
+      ActualizarContenidosNoPublicadosBean bean = mapper.readValue(body, ActualizarContenidosNoPublicadosBean.class);
+      localidadesRepository.actualizarContenidoPublicado(bean);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException("Error al deserializar body", e);
+    }
   }
 
 }
