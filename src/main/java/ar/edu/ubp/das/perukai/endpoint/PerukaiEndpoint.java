@@ -70,8 +70,8 @@ public class PerukaiEndpoint {
   @ResponsePayload
   public CrearReservaDesdeRistorinoResponse crearReservaDesdeRistorino(
       @RequestPayload CrearReservaDesdeRistorino request) {
-    CrearReservaConClienteBean reserva = request.getCrearReservaDesdeRistorinoRequest();
-    perukaiService.crearReservaDesdeRistorino(reserva);
+    String bodyString = request.getBody();
+    perukaiService.crearReservaDesdeRistorino(bodyString);
     return new CrearReservaDesdeRistorinoResponse();
   }
 

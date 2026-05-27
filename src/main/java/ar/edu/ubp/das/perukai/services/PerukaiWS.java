@@ -56,29 +56,37 @@ public class PerukaiWS {
   @ResponseWrapper(localName = "CrearReservaDesdeRistorinoResponse")
   @WebResult(name = "ReservaDesdeRistorinoResponse")
   public void crearReservaDesdeRistorino(
-      @WebParam(name = "CrearReservaDesdeRistorinoRequest") CrearReservaConClienteBean body) {
+      @WebParam(name = "Body") String body) {
+    try {
 
-    System.out.println(" LLEGUE ACA");
-    // 1) Insertar cliente
-    localidadesRepository.insertarClienteDesdeRistorino(
-        body.getCliente().getNroCliente(),
-        body.getCliente().getApellido(),
-        body.getCliente().getNombre(),
-        body.getCliente().getCorreo(),
-        body.getCliente().getTelefonos());
+      ObjectMapper mapper = new ObjectMapper();
 
-    // 2) Insertar reserva
-    localidadesRepository.crearReservaSucursal(
-        body.getReserva().getCodReserva(),
-        body.getReserva().getNroCliente(),
-        LocalDate.parse(body.getReserva().getFechaReserva()),
-        body.getReserva().getNroRestaurante(),
-        body.getReserva().getNroSucursal(),
-        body.getReserva().getCodZona(),
-        LocalTime.parse(body.getReserva().getHoraReserva()),
-        body.getReserva().getCantAdultos(),
-        body.getReserva().getCantMenores(),
-        body.getReserva().getCostoReserva());
+      CrearReservaConClienteBean reservaCliente = mapper.readValue(body, CrearReservaConClienteBean.class);
+
+      // 1) Insertar cliente
+      localidadesRepository.insertarClienteDesdeRistorino(
+          reservaCliente.getNroCliente(),
+          reservaCliente.getApellido(),
+          reservaCliente.getNombre(),
+          reservaCliente.getCorreo(),
+          reservaCliente.getTelefonos());
+
+      // 2) Insertar reserva
+      localidadesRepository.crearReservaSucursal(
+          reservaCliente.getCodReserva(),
+          reservaCliente.getNroCliente(),
+          LocalDate.parse(reservaCliente.getFechaReserva()),
+          reservaCliente.getNroRestaurante(),
+          reservaCliente.getNroSucursal(),
+          reservaCliente.getCodZona(),
+          LocalTime.parse(reservaCliente.getHoraReserva()),
+          reservaCliente.getCantAdultos(),
+          reservaCliente.getCantMenores(),
+          reservaCliente.getCostoReserva());
+
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException("Error al deserializar body", e);
+    }
   }
 
   // ACTUALIZAR LA RESERVA DE UN CLIENTE
