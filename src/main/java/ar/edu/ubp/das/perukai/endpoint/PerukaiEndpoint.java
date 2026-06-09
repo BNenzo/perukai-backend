@@ -89,7 +89,7 @@ public class PerukaiEndpoint {
   @PayloadRoot(namespace = NAMESPACE_URI, localPart = "ActualizarContenidosNoPublicadosRequest")
   @ResponsePayload
   public ActualizarContenidosNoPublicadosResponse actualizarContenidosNoPublicados(
-      @RequestPayload ActualizarContenidosNoPublicados request) {
+      @RequestPayload ActualizarContenidosNoPublicados request) { // Podriamos poner misma clase de string..
     String body = request.getBody();
     perukaiService.ActualizarContenidosNoPublicados(body);
     return new ActualizarContenidosNoPublicadosResponse();

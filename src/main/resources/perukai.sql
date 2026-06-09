@@ -598,3 +598,5 @@ EXEC dbo.sp_get_contenidos_no_publicados
 
 select * from contenidos
 select * from reservas_sucursales
+
+select * from clicks_contenidos

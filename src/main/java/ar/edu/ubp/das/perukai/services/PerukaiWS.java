@@ -2,11 +2,14 @@ package ar.edu.ubp.das.perukai.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
+
 import ar.edu.ubp.das.perukai.beans.ActualizarContenidosNoPublicadosBean;
 import ar.edu.ubp.das.perukai.beans.ActualizarReservaClienteRequestBean;
 import ar.edu.ubp.das.perukai.beans.ClicksContenidosRestaurantesBean;
 import ar.edu.ubp.das.perukai.beans.ContenidoNoPublicadoBean;
 import ar.edu.ubp.das.perukai.beans.CrearReservaConClienteBean;
+import ar.edu.ubp.das.perukai.beans.CrearReservaConClienteDTO;
 import ar.edu.ubp.das.perukai.beans.ProvinciaBean;
 import ar.edu.ubp.das.perukai.repositories.PerukaiRepository;
 import jakarta.jws.WebMethod;
@@ -28,6 +31,8 @@ import java.util.List;
 public class PerukaiWS {
   @Autowired
   private PerukaiRepository localidadesRepository;
+
+  private static final Gson GSON = new Gson();
 
   @WebMethod(operationName = "ObtenerProvincias")
   @RequestWrapper(localName = "ObtenerProvinciasRequest")
@@ -57,36 +62,27 @@ public class PerukaiWS {
   @WebResult(name = "ReservaDesdeRistorinoResponse")
   public void crearReservaDesdeRistorino(
       @WebParam(name = "Body") String body) {
-    try {
+    CrearReservaConClienteDTO reservaCliente = GSON.fromJson(body, CrearReservaConClienteDTO.class);
+    // 1) Insertar cliente
+    localidadesRepository.insertarClienteDesdeRistorino(
+        reservaCliente.getCliente().getNroCliente(),
+        reservaCliente.getCliente().getApellido(),
+        reservaCliente.getCliente().getNombre(),
+        reservaCliente.getCliente().getCorreo(),
+        reservaCliente.getCliente().getTelefonos());
 
-      ObjectMapper mapper = new ObjectMapper();
-
-      CrearReservaConClienteBean reservaCliente = mapper.readValue(body, CrearReservaConClienteBean.class);
-
-      // 1) Insertar cliente
-      localidadesRepository.insertarClienteDesdeRistorino(
-          reservaCliente.getNroCliente(),
-          reservaCliente.getApellido(),
-          reservaCliente.getNombre(),
-          reservaCliente.getCorreo(),
-          reservaCliente.getTelefonos());
-
-      // 2) Insertar reserva
-      localidadesRepository.crearReservaSucursal(
-          reservaCliente.getCodReserva(),
-          reservaCliente.getNroCliente(),
-          LocalDate.parse(reservaCliente.getFechaReserva()),
-          reservaCliente.getNroRestaurante(),
-          reservaCliente.getNroSucursal(),
-          reservaCliente.getCodZona(),
-          LocalTime.parse(reservaCliente.getHoraReserva()),
-          reservaCliente.getCantAdultos(),
-          reservaCliente.getCantMenores(),
-          reservaCliente.getCostoReserva());
-
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException("Error al deserializar body", e);
-    }
+    // 2) Insertar reserva
+    localidadesRepository.crearReservaSucursal(
+        reservaCliente.getReserva().getCodReserva(),
+        reservaCliente.getReserva().getNroCliente(),
+        LocalDate.parse(reservaCliente.getReserva().getFechaReserva()),
+        reservaCliente.getReserva().getNroRestaurante(),
+        reservaCliente.getReserva().getNroSucursal(),
+        reservaCliente.getReserva().getCodZona(),
+        LocalTime.parse(reservaCliente.getReserva().getHoraReserva()),
+        reservaCliente.getReserva().getCantAdultos(),
+        reservaCliente.getReserva().getCantMenores(),
+        reservaCliente.getReserva().getCostoReserva());
   }
 
   // ACTUALIZAR LA RESERVA DE UN CLIENTE
