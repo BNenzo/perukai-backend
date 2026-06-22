@@ -1,30 +1,21 @@
 package ar.edu.ubp.das.perukai.endpoint;
 
-import ar.edu.ubp.das.perukai.beans.ActualizarReservaClienteRequestBean;
-import ar.edu.ubp.das.perukai.beans.ClicksContenidosRestaurantesBean;
-import ar.edu.ubp.das.perukai.beans.CrearReservaConClienteBean;
-import ar.edu.ubp.das.perukai.beans.ProvinciaBean;
 import ar.edu.ubp.das.perukai.services.PerukaiWS;
-import ar.edu.ubp.das.perukai.services.jaxws.ObtenerProvinciasResponse;
 import ar.edu.ubp.das.perukai.services.jaxws.RegistrarClickContenido;
 import ar.edu.ubp.das.perukai.services.jaxws.RegistrarClickContenidoResponse;
 import ar.edu.ubp.das.perukai.services.jaxws.CrearReservaDesdeRistorino;
 import ar.edu.ubp.das.perukai.services.jaxws.CrearReservaDesdeRistorinoResponse;
 import ar.edu.ubp.das.perukai.services.jaxws.ActualizarContenidosNoPublicados;
 import ar.edu.ubp.das.perukai.services.jaxws.ActualizarContenidosNoPublicadosResponse;
-import ar.edu.ubp.das.perukai.services.jaxws.ActualizarReservaCliente;
-import ar.edu.ubp.das.perukai.services.jaxws.ActualizarReservaClienteResponse;
 import ar.edu.ubp.das.perukai.services.jaxws.ObtenerContenidosNoPublicados;
 import ar.edu.ubp.das.perukai.services.jaxws.ObtenerContenidosNoPublicadosResponse;
-import ar.edu.ubp.das.perukai.services.jaxws.ObtenerProvincias;
+import ar.edu.ubp.das.perukai.services.jaxws.ObtenerDisponibilidadHorariaZona;
+import ar.edu.ubp.das.perukai.services.jaxws.ObtenerDisponibilidadHorariaZonaResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
 import org.springframework.ws.server.endpoint.annotation.RequestPayload;
 import org.springframework.ws.server.endpoint.annotation.ResponsePayload;
-
-import java.util.List;
 
 @Endpoint
 public class PerukaiEndpoint {
@@ -32,20 +23,11 @@ public class PerukaiEndpoint {
   private static final String NAMESPACE_URI = "http://services.perukai.das.ubp.edu.ar/";
   private PerukaiWS perukaiService;
 
-  @Autowired
   public PerukaiEndpoint(PerukaiWS perukaiService) {
     this.perukaiService = perukaiService;
   }
 
-  @PayloadRoot(namespace = NAMESPACE_URI, localPart = "ObtenerProvinciasRequest")
-  @ResponsePayload
-  public ObtenerProvinciasResponse obtenerProvincias(@RequestPayload ObtenerProvincias request) {
-    List<ProvinciaBean> paises = perukaiService.obtenerProvincias();
-    ObtenerProvinciasResponse response = new ObtenerProvinciasResponse();
-    response.setProvinciasResponse(paises);
-    return response;
-  }
-
+  // REGISTAR CLICK DE UN CONTENIDO
   @PayloadRoot(namespace = NAMESPACE_URI, localPart = "RegistrarClickContenidoRequest")
   @ResponsePayload
   public RegistrarClickContenidoResponse insertarLocalidad(@RequestPayload RegistrarClickContenido request) {
@@ -71,27 +53,31 @@ public class PerukaiEndpoint {
   public CrearReservaDesdeRistorinoResponse crearReservaDesdeRistorino(
       @RequestPayload CrearReservaDesdeRistorino request) {
     String bodyString = request.getBody();
-    perukaiService.crearReservaDesdeRistorino(bodyString);
-    return new CrearReservaDesdeRistorinoResponse();
+    String codReserva = perukaiService.crearReservaDesdeRistorino(bodyString);
+    CrearReservaDesdeRistorinoResponse response = new CrearReservaDesdeRistorinoResponse();
+    response.setSoapStringResponse(codReserva);
+    return response;
   }
 
-  // // ACTUALIZAR LA RESERVA DE UN CLIENTE
-  @PayloadRoot(namespace = NAMESPACE_URI, localPart = "ActualizarReservaClienteRequest")
-  @ResponsePayload
-  public ActualizarReservaClienteResponse actualizarReservaCliente(
-      @RequestPayload ActualizarReservaCliente request) {
-    ActualizarReservaClienteRequestBean actualizarReservaCliente = request.getActualizarReservaClienteRequest();
-    perukaiService.actualizarReservaCliente(actualizarReservaCliente);
-    return new ActualizarReservaClienteResponse();
-  }
-
-  // // ACTUALIZAR LOS CONTENIDOS NO PUBLICADOS A PUBLICADOS
+  // ACTUALIZAR LOS CONTENIDOS NO PUBLICADOS A PUBLICADOS
   @PayloadRoot(namespace = NAMESPACE_URI, localPart = "ActualizarContenidosNoPublicadosRequest")
   @ResponsePayload
   public ActualizarContenidosNoPublicadosResponse actualizarContenidosNoPublicados(
-      @RequestPayload ActualizarContenidosNoPublicados request) { // Podriamos poner misma clase de string..
+      @RequestPayload ActualizarContenidosNoPublicados request) {
     String body = request.getBody();
     perukaiService.ActualizarContenidosNoPublicados(body);
     return new ActualizarContenidosNoPublicadosResponse();
+  }
+
+  // OBTENER CONTENIDOS NO PUBLICADOS
+  @PayloadRoot(namespace = NAMESPACE_URI, localPart = "ObtenerDisponibilidadHorariaZonaRequest")
+  @ResponsePayload
+  public ObtenerDisponibilidadHorariaZonaResponse obtenerDisponibilidadHorariaZona(
+      @RequestPayload ObtenerDisponibilidadHorariaZona request) {
+    String body = request.getBody();
+    String responseString = perukaiService.obtenerDisponibilidadHorariaZona(body);
+    ObtenerDisponibilidadHorariaZonaResponse response = new ObtenerDisponibilidadHorariaZonaResponse();
+    response.setSoapStringResponse(responseString);
+    return response;
   }
 }

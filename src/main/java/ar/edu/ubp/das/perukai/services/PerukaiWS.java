@@ -1,17 +1,15 @@
 package ar.edu.ubp.das.perukai.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
-import ar.edu.ubp.das.perukai.beans.ActualizarContenidosNoPublicadosBean;
-import ar.edu.ubp.das.perukai.beans.ActualizarReservaClienteRequestBean;
-import ar.edu.ubp.das.perukai.beans.ClicksContenidosRestaurantesBean;
-import ar.edu.ubp.das.perukai.beans.ContenidoNoPublicadoBean;
-import ar.edu.ubp.das.perukai.beans.CrearReservaConClienteBean;
-import ar.edu.ubp.das.perukai.beans.CrearReservaConClienteDTO;
-import ar.edu.ubp.das.perukai.beans.ProvinciaBean;
+import ar.edu.ubp.das.perukai.beans.ActualizarContenidosNoPublicadosRequestBean;
+import ar.edu.ubp.das.perukai.beans.ContenidoNoPublicadoResponseBean;
+import ar.edu.ubp.das.perukai.beans.CrearReservaConClienteRequestDTO;
+import ar.edu.ubp.das.perukai.beans.ObtenerDisponibilidadHorariaZonaResponseBean;
 import ar.edu.ubp.das.perukai.repositories.PerukaiRepository;
+import ar.edu.ubp.das.perukai.utils.Utils;
 import jakarta.jws.WebMethod;
 import jakarta.jws.WebParam;
 import jakarta.jws.WebResult;
@@ -25,46 +23,86 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @WebService(serviceName = "PerukaiWS", targetNamespace = "http://services.perukai.das.ubp.edu.ar/")
 public class PerukaiWS {
+
   @Autowired
-  private PerukaiRepository localidadesRepository;
+  private PerukaiRepository perukaiRepository;
 
   private static final Gson GSON = new Gson();
-
-  @WebMethod(operationName = "ObtenerProvincias")
-  @RequestWrapper(localName = "ObtenerProvinciasRequest")
-  @ResponseWrapper(localName = "ObtenerProvinciasResponse")
-  @WebResult(name = "ProvinciasResponse")
-  public List<ProvinciaBean> obtenerProvincias() {
-    return localidadesRepository.getProvincias();
-  }
 
   @WebMethod(operationName = "RegistrarClickContenido")
   @RequestWrapper(localName = "RegistrarClickContenidoRequest")
   @ResponseWrapper(localName = "RegistrarClickContenidoResponse")
-  public void registrarClickContenido(
-      @WebParam(name = "Body") String body) {
-    try {
-      ObjectMapper mapper = new ObjectMapper();
-      ClicksContenidosRestaurantesBean bodyJson = mapper.readValue(body, ClicksContenidosRestaurantesBean.class);
-      localidadesRepository.registrarClickContenido(bodyJson);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException("Error al deserializar body", e);
+  public void registrarClickContenido(@WebParam(name = "Body") String body) {
+    JsonObject json = JsonParser.parseString(body).getAsJsonObject();
+
+    if (json.has("nroCliente") && !json.get("nroCliente").isJsonNull()) {
+      // 1) Insertar cliente
+      perukaiRepository.insertarClienteDesdeRistorino(
+          json.get("nroCliente").getAsInt(),
+          json.get("apellido").getAsString(),
+          json.get("nombre").getAsString(),
+          json.get("correo").getAsString(),
+          json.get("telefonos").getAsString());
     }
+
+    perukaiRepository.registrarClickContenido(
+        json.get("nroRestaurante").getAsInt(),
+        json.get("nroContenido").getAsInt(),
+        json.get("nroClick").getAsInt(),
+        json.get("fechaHoraRegistro").getAsString(),
+        (json.has("nroCliente") && !json.get("nroCliente").isJsonNull())
+            ? json.get("nroCliente").getAsInt()
+            : null,
+        json.get("costoClick").getAsBigDecimal());
   }
 
   @WebMethod(operationName = "CrearReservaDesdeRistorino")
   @RequestWrapper(localName = "CrearReservaDesdeRistorinoRequest")
   @ResponseWrapper(localName = "CrearReservaDesdeRistorinoResponse")
-  @WebResult(name = "ReservaDesdeRistorinoResponse")
-  public void crearReservaDesdeRistorino(
-      @WebParam(name = "Body") String body) {
-    CrearReservaConClienteDTO reservaCliente = GSON.fromJson(body, CrearReservaConClienteDTO.class);
+  @WebResult(name = "SoapStringResponse")
+  public String crearReservaDesdeRistorino(@WebParam(name = "Body") String body) {
+    CrearReservaConClienteRequestDTO reservaCliente = GSON.fromJson(body, CrearReservaConClienteRequestDTO.class);
+
+    List<ObtenerDisponibilidadHorariaZonaResponseBean> horariosPorZona = perukaiRepository
+        .obtenerDisponibilidadHorariaZona(
+            reservaCliente.getReserva().getNroSucursal(),
+            reservaCliente.getReserva().getCodZona(),
+            reservaCliente.getReserva().getFechaReserva());
+
+    String horaRequest = reservaCliente.getReserva().getHoraReserva().toString();
+
+    Optional<ObtenerDisponibilidadHorariaZonaResponseBean> opt = horariosPorZona.stream()
+        .filter(h -> horaRequest.equals(h.getHoraDesde().substring(0, 5)))
+        .findFirst();
+
+    if (opt.isEmpty()) {
+      // no existe turno para esa hora
+      throw new RuntimeException("No hay turno para la hora solicitada");
+    }
+
+    ObtenerDisponibilidadHorariaZonaResponseBean turno = opt.get();
+
+    // Validaciones sobre el encontrado
+    if (turno.getHabilitado() != null && turno.getHabilitado() == 0) {
+      throw new RuntimeException("El turno no está habilitado");
+    }
+    if (turno.getCupoDisponible() == null || turno.getCupoDisponible() <= 0) {
+      throw new RuntimeException("No hay cupo disponible");
+    }
+    if (turno.getCupoDisponible() < reservaCliente.getReserva().getCantAdultos()
+        + reservaCliente.getReserva().getCantMenores()) {
+      throw new RuntimeException("No hay cupo disponible para la cantidad de comensales solicitada");
+    }
+
+    String codReservaSucursal = Utils.generarCodigoReserva();
+
     // 1) Insertar cliente
-    localidadesRepository.insertarClienteDesdeRistorino(
+    perukaiRepository.insertarClienteDesdeRistorino(
         reservaCliente.getCliente().getNroCliente(),
         reservaCliente.getCliente().getApellido(),
         reservaCliente.getCliente().getNombre(),
@@ -72,8 +110,8 @@ public class PerukaiWS {
         reservaCliente.getCliente().getTelefonos());
 
     // 2) Insertar reserva
-    localidadesRepository.crearReservaSucursal(
-        reservaCliente.getReserva().getCodReserva(),
+    perukaiRepository.crearReservaSucursal(
+        codReservaSucursal,
         reservaCliente.getReserva().getNroCliente(),
         LocalDate.parse(reservaCliente.getReserva().getFechaReserva()),
         reservaCliente.getReserva().getNroRestaurante(),
@@ -83,16 +121,8 @@ public class PerukaiWS {
         reservaCliente.getReserva().getCantAdultos(),
         reservaCliente.getReserva().getCantMenores(),
         reservaCliente.getReserva().getCostoReserva());
-  }
 
-  // ACTUALIZAR LA RESERVA DE UN CLIENTE
-  @WebMethod(operationName = "ActualizarReservaCliente")
-  @RequestWrapper(localName = "ActualizarReservaClienteRequest")
-  @ResponseWrapper(localName = "ActualizarReservaClienteResponse")
-  @WebResult(name = "ReservaClienteResponse")
-  public void actualizarReservaCliente(
-      @WebParam(name = "ActualizarReservaClienteRequest") ActualizarReservaClienteRequestBean body) {
-    localidadesRepository.actualizarReservaCliente(body);
+    return codReservaSucursal;
   }
 
   // OBTENER CONTENIDOS NO PUBLICADOS
@@ -101,29 +131,32 @@ public class PerukaiWS {
   @ResponseWrapper(localName = "ObtenerContenidosNoPublicadosResponse")
   @WebResult(name = "SoapStringResponse")
   public String obtenerContenidosNoPublicados() {
-    List<ContenidoNoPublicadoBean> contenidos = localidadesRepository.getContenidosNoPublicados();
-    try {
-      ObjectMapper mapper = new ObjectMapper();
-      return mapper.writeValueAsString(contenidos);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException("Error al serializar contenidos", e);
-    }
+    List<ContenidoNoPublicadoResponseBean> contenidos = perukaiRepository.getContenidosNoPublicados();
+    return new Gson().toJson(contenidos);
   }
 
   // ACTUALIZAR LOS CONTENIDOS NO PUBLICADOS A PUBLICADOS
   @WebMethod(operationName = "ActualizarContenidosNoPublicados")
   @RequestWrapper(localName = "ActualizarContenidosNoPublicadosRequest")
   @ResponseWrapper(localName = "ActualizarContenidosNoPublicadosResponse")
-  @WebResult(name = "ContenidoNoPublicadosResponse")
   public void ActualizarContenidosNoPublicados(
       @WebParam(name = "Body") String body) {
-    try {
-      ObjectMapper mapper = new ObjectMapper();
-      ActualizarContenidosNoPublicadosBean bean = mapper.readValue(body, ActualizarContenidosNoPublicadosBean.class);
-      localidadesRepository.actualizarContenidoPublicado(bean);
-    } catch (JsonProcessingException e) {
-      throw new RuntimeException("Error al deserializar body", e);
-    }
+    ActualizarContenidosNoPublicadosRequestBean bean = GSON.fromJson(body,
+        ActualizarContenidosNoPublicadosRequestBean.class);
+    perukaiRepository.actualizarContenidoPublicado(new Gson().toJson(bean.getContenidos()));
+  }
+
+  // OBTENER DISPONIBILIDAD HORARIA ZONA
+  @WebMethod(operationName = "ObtenerDisponibilidadHorariaZona")
+  @RequestWrapper(localName = "ObtenerDisponibilidadHorariaZonaRequest")
+  @ResponseWrapper(localName = "ObtenerDisponibilidadHorariaZonaResponse")
+  @WebResult(name = "SoapStringResponse")
+  public String obtenerDisponibilidadHorariaZona(@WebParam(name = "Body") String body) {
+    JsonObject json = JsonParser.parseString(body).getAsJsonObject();
+    return new Gson().toJson(perukaiRepository.obtenerDisponibilidadHorariaZona(
+        json.get("nroSucursal").getAsInt(),
+        json.get("codZona").getAsString(),
+        json.get("fechaAReservar").getAsString()));
   }
 
 }

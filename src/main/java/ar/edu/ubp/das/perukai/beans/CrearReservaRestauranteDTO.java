@@ -1,11 +1,8 @@
 package ar.edu.ubp.das.perukai.beans;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
-
 public class CrearReservaRestauranteDTO {
 
-  private String codReserva; // cod_reserva / cod_reserva_sucursal
+  private String codReserva;
   private Integer nroCliente;
   private String fechaReserva;
   private Integer nroRestaurante;

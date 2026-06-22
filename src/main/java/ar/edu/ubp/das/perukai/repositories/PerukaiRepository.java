@@ -1,18 +1,14 @@
 package ar.edu.ubp.das.perukai.repositories;
 
-import ar.edu.ubp.das.perukai.beans.ActualizarContenidosNoPublicadosBean;
-import ar.edu.ubp.das.perukai.beans.ActualizarReservaClienteRequestBean;
-import ar.edu.ubp.das.perukai.beans.ClicksContenidosRestaurantesBean;
-import ar.edu.ubp.das.perukai.beans.ContenidoNoPublicadoBean;
-import ar.edu.ubp.das.perukai.beans.ProvinciaBean;
+import ar.edu.ubp.das.perukai.beans.ContenidoNoPublicadoResponseBean;
+import ar.edu.ubp.das.perukai.beans.ObtenerDisponibilidadHorariaZonaResponseBean;
 import ar.edu.ubp.das.perukai.components.SimpleJdbcCallFactory;
-import tools.jackson.databind.ObjectMapper;
-import tools.jackson.databind.exc.JsonNodeException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -22,25 +18,25 @@ public class PerukaiRepository {
   @Autowired
   private SimpleJdbcCallFactory jdbcCallFactory;
 
-  public List<ProvinciaBean> getProvincias() {
-    return jdbcCallFactory.executeQuery("sp_get_provincias", "dbo", "provincias",
-        ProvinciaBean.class);
-  }
-
-  public void registrarClickContenido(ClicksContenidosRestaurantesBean body) {
+  // REGISTRAR CLICKS DE UN CONTENIDO
+  public void registrarClickContenido(int nroRestaurante,
+      int nroContenido,
+      int nroClick,
+      String fechaHoraRegistro,
+      Integer nroCliente,
+      BigDecimal costoClick) {
     MapSqlParameterSource p = new MapSqlParameterSource()
-        .addValue("nro_restaurante", body.getNroRestaurante())
-        .addValue("nro_contenido", body.getNroContenido())
-        .addValue("nro_click", body.getNroClick())
-        .addValue("fecha_hora_registro", body.getFechaHoraRegistro())
-        .addValue("nro_cliente", body.getNroCliente())
-        .addValue("costo_click", body.getCostoClick());
-
+        .addValue("nro_restaurante", nroRestaurante)
+        .addValue("nro_contenido", nroContenido)
+        .addValue("nro_click", nroClick)
+        .addValue("fecha_hora_registro", fechaHoraRegistro)
+        .addValue("nro_cliente", nroCliente)
+        .addValue("costo_click", costoClick);
     jdbcCallFactory.executeWithOutputs("sp_insert_click_contenido", "dbo", p);
   }
 
   // OBTENER CONTENIDOS NO PUBLICADOS
-  public List<ContenidoNoPublicadoBean> getContenidosNoPublicados() {
+  public List<ContenidoNoPublicadoResponseBean> getContenidosNoPublicados() {
     MapSqlParameterSource p = new MapSqlParameterSource();
 
     return jdbcCallFactory.executeQuery(
@@ -48,7 +44,7 @@ public class PerukaiRepository {
         "dbo",
         p,
         "contenidos_no_publicados",
-        ContenidoNoPublicadoBean.class);
+        ContenidoNoPublicadoResponseBean.class);
   }
 
   // ===============================
@@ -89,9 +85,6 @@ public class PerukaiRepository {
       Integer cantMenores,
       Double costoReserva) {
 
-    System.out.println(fechaReserva);
-    System.out.println(horaReserva);
-    System.out.println(codZona);
     MapSqlParameterSource p = new MapSqlParameterSource()
         .addValue("cod_reserva", codReserva)
         .addValue("nro_cliente", nroCliente)
@@ -110,36 +103,31 @@ public class PerukaiRepository {
         p);
   }
 
-  // ACTUALIZAR LA RESERVA DE UN CLIENTE
-  public void actualizarReservaCliente(ActualizarReservaClienteRequestBean request) {
-    MapSqlParameterSource params = new MapSqlParameterSource()
-        .addValue("cod_reserva", request.getCodReservaSucursal())
-        .addValue("cant_adultos", request.getCantAdultos())
-        .addValue("cant_menores", request.getCantMenores())
-        .addValue("fecha_reserva", request.getFechaReserva())
-        .addValue("hora_reserva", request.getHoraReserva())
-        .addValue("fecha_cancelacion", request.getFechaCancelacion())
-        .addValue("cancelada", request.getFechaCancelacion() != null ? 1 : null);
-
-    jdbcCallFactory.executeWithOutputs(
-        "sp_actualizar_reserva_cliente",
-        "dbo",
-        params);
-  }
-
   // ACTUALIZAR LOS CONTENIDOS NO PUBLICADOS A PUBLICADOS
-  public void actualizarContenidoPublicado(ActualizarContenidosNoPublicadosBean request)
-      throws JsonNodeException {
-    ObjectMapper om = new ObjectMapper();
-    String json = om.writeValueAsString(request.getContenidos());
-
+  public void actualizarContenidoPublicado(String contenidos) {
     MapSqlParameterSource params = new MapSqlParameterSource()
-        .addValue("json", json);
+        .addValue("json", contenidos);
 
     jdbcCallFactory.executeWithOutputs(
         "sp_actualizar_contenido_no_publicado",
         "dbo",
         params);
+  }
+
+  public List<ObtenerDisponibilidadHorariaZonaResponseBean> obtenerDisponibilidadHorariaZona(
+      Integer nroSucursal, String codZona, String fechaReserva) {
+
+    MapSqlParameterSource params = new MapSqlParameterSource()
+        .addValue("nro_sucursal", nroSucursal)
+        .addValue("fecha_reserva", fechaReserva)
+        .addValue("cod_zona", codZona);
+
+    return jdbcCallFactory.executeQuery(
+        "sp_obtener_disponibilidad_por_zona",
+        "dbo",
+        params,
+        "disponibilidad_horarios",
+        ObtenerDisponibilidadHorariaZonaResponseBean.class);
   }
 
 }

@@ -6,12 +6,6 @@
       <xsd:import namespace="http://services.perukai.das.ubp.edu.ar/" schemaLocation="PerukaiWS_schema1.xsd"/>
     </xsd:schema>
   </types>
-  <message name="ObtenerProvincias">
-    <part name="parameters" element="tns:ObtenerProvinciasRequest"/>
-  </message>
-  <message name="ObtenerProvinciasResponse">
-    <part name="parameters" element="tns:ObtenerProvinciasResponse"/>
-  </message>
   <message name="RegistrarClickContenido">
     <part name="parameters" element="tns:RegistrarClickContenidoRequest"/>
   </message>
@@ -24,11 +18,11 @@
   <message name="CrearReservaDesdeRistorinoResponse">
     <part name="parameters" element="tns:CrearReservaDesdeRistorinoResponse"/>
   </message>
-  <message name="ActualizarReservaCliente">
-    <part name="parameters" element="tns:ActualizarReservaClienteRequest"/>
+  <message name="ObtenerDisponibilidadHorariaZona">
+    <part name="parameters" element="tns:ObtenerDisponibilidadHorariaZonaRequest"/>
   </message>
-  <message name="ActualizarReservaClienteResponse">
-    <part name="parameters" element="tns:ActualizarReservaClienteResponse"/>
+  <message name="ObtenerDisponibilidadHorariaZonaResponse">
+    <part name="parameters" element="tns:ObtenerDisponibilidadHorariaZonaResponse"/>
   </message>
   <message name="ObtenerContenidosNoPublicados">
     <part name="parameters" element="tns:ObtenerContenidosNoPublicadosRequest"/>
@@ -43,10 +37,6 @@
     <part name="parameters" element="tns:ActualizarContenidosNoPublicadosResponse"/>
   </message>
   <portType name="PerukaiWS">
-    <operation name="ObtenerProvincias">
-      <input wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/ObtenerProvinciasRequest" message="tns:ObtenerProvincias"/>
-      <output wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/ObtenerProvinciasResponse" message="tns:ObtenerProvinciasResponse"/>
-    </operation>
     <operation name="RegistrarClickContenido">
       <input wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/RegistrarClickContenidoRequest" message="tns:RegistrarClickContenido"/>
       <output wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/RegistrarClickContenidoResponse" message="tns:RegistrarClickContenidoResponse"/>
@@ -55,9 +45,9 @@
       <input wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/CrearReservaDesdeRistorinoRequest" message="tns:CrearReservaDesdeRistorino"/>
       <output wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/CrearReservaDesdeRistorinoResponse" message="tns:CrearReservaDesdeRistorinoResponse"/>
     </operation>
-    <operation name="ActualizarReservaCliente">
-      <input wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/ActualizarReservaClienteRequest" message="tns:ActualizarReservaCliente"/>
-      <output wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/ActualizarReservaClienteResponse" message="tns:ActualizarReservaClienteResponse"/>
+    <operation name="ObtenerDisponibilidadHorariaZona">
+      <input wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/ObtenerDisponibilidadHorariaZonaRequest" message="tns:ObtenerDisponibilidadHorariaZona"/>
+      <output wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/ObtenerDisponibilidadHorariaZonaResponse" message="tns:ObtenerDisponibilidadHorariaZonaResponse"/>
     </operation>
     <operation name="ObtenerContenidosNoPublicados">
       <input wsam:Action="http://services.perukai.das.ubp.edu.ar/PerukaiWS/ObtenerContenidosNoPublicadosRequest" message="tns:ObtenerContenidosNoPublicados"/>
@@ -70,15 +60,6 @@
   </portType>
   <binding name="PerukaiWSPortBinding" type="tns:PerukaiWS">
     <soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
-    <operation name="ObtenerProvincias">
-      <soap:operation soapAction=""/>
-      <input>
-        <soap:body use="literal"/>
-      </input>
-      <output>
-        <soap:body use="literal"/>
-      </output>
-    </operation>
     <operation name="RegistrarClickContenido">
       <soap:operation soapAction=""/>
       <input>
@@ -97,7 +78,7 @@
         <soap:body use="literal"/>
       </output>
     </operation>
-    <operation name="ActualizarReservaCliente">
+    <operation name="ObtenerDisponibilidadHorariaZona">
       <soap:operation soapAction=""/>
       <input>
         <soap:body use="literal"/>

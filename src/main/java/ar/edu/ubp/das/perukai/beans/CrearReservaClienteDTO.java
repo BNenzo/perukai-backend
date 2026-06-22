@@ -1,12 +1,15 @@
 package ar.edu.ubp.das.perukai.beans;
 
-public class ClienteRestauranteBean {
+public class CrearReservaClienteDTO {
 
   private Integer nroCliente;
   private String apellido;
   private String nombre;
   private String correo;
   private String telefonos;
+
+  public CrearReservaClienteDTO() {
+  }
 
   public Integer getNroCliente() {
     return nroCliente;

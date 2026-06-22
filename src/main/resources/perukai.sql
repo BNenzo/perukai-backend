@@ -339,7 +339,7 @@ CREATE TABLE clicks_contenidos (
     nro_contenido INT NOT NULL,
     nro_click INT NOT NULL,
     fecha_hora_registro DATETIME NOT NULL,
-    nro_cliente INT NOT NULL,
+    nro_cliente INT,
     costo_click DECIMAL(10,2) NOT NULL,
     PRIMARY KEY (nro_restaurante, nro_contenido, nro_click),
     FOREIGN KEY (nro_restaurante, nro_contenido)
@@ -592,11 +592,119 @@ BEGIN
     ON 1 = c.nro_restaurante
    AND i.nroContenido   = c.nro_contenido;
 END
+
+GO
+CREATE OR ALTER PROCEDURE dbo.sp_obtener_disponibilidad_por_zona
+    @nro_sucursal  INT,
+    @fecha_reserva DATE,
+    @cod_zona      VARCHAR(15)
+AS
+BEGIN
+    SET NOCOUNT ON;
+
+    SELECT
+        zts.nro_restaurante,
+        zts.nro_sucursal,
+        zts.cod_zona,
+        zs.cant_comensales,
+        zs.permite_menores,
+        zts.hora_desde,
+        ts.hora_hasta,
+        ts.habilitado,
+
+        ISNULL(SUM(rs.cant_adultos + rs.cant_menores), 0)       AS cantidad_reservada,
+        zs.cant_comensales
+            - ISNULL(SUM(rs.cant_adultos + rs.cant_menores), 0) AS cupo_disponible
+
+    FROM dbo.zonas_turnos_sucursales    AS zts
+
+    INNER JOIN dbo.zonas_sucursales     AS zs
+        ON  zs.nro_restaurante = zts.nro_restaurante
+        AND zs.nro_sucursal    = zts.nro_sucursal
+        AND zs.cod_zona        = zts.cod_zona
+
+    INNER JOIN dbo.turnos_sucursales    AS ts
+        ON  ts.nro_restaurante = zts.nro_restaurante
+        AND ts.nro_sucursal    = zts.nro_sucursal
+        AND ts.hora_desde      = zts.hora_desde
+
+    LEFT JOIN dbo.reservas_sucursales   AS rs
+        ON  rs.nro_restaurante = zts.nro_restaurante
+        AND rs.nro_sucursal    = zts.nro_sucursal
+        AND rs.cod_zona        = zts.cod_zona
+        AND rs.hora_reserva    = zts.hora_desde
+        AND rs.fecha_reserva   = @fecha_reserva
+        AND rs.cancelada       = 0              -- ⚠️ diferencia clave (ver abajo)
+
+    WHERE
+        zts.nro_sucursal = @nro_sucursal
+        AND zts.cod_zona = @cod_zona
+        AND ts.habilitado = 1
+        AND zs.habilitada = 1
+
+    GROUP BY
+        zts.nro_restaurante,
+        zts.nro_sucursal,
+        zts.cod_zona,
+        zs.cant_comensales,
+        zs.permite_menores,
+        zts.hora_desde,
+        ts.hora_hasta,
+        ts.habilitado
+
+    ORDER BY
+        zts.hora_desde;
+END
 GO
 
-EXEC dbo.sp_get_contenidos_no_publicados
 
-select * from contenidos
-select * from reservas_sucursales
+
+-- ============================================================
+-- RESERVAS DE PRUEBA - fecha: 2026-06-15
+-- ============================================================
+
+-- ============================================================
+-- SUCURSAL 1 - Nueva Córdoba
+-- ============================================================
+
+-- -- ✅ TURNO CON CUPO DISPONIBLE - salon 13:00 (1 reserva de 3, quedan 17)
+-- INSERT INTO reservas_sucursales VALUES
+-- ('PK-1-1-001', GETDATE(), 1, '2026-06-15', 1, 1, 'salon', '13:00', 2, 1, 1500.00, 0, NULL);
+
+-- -- ⚠️ TURNO CASI LLENO - barra 13:00 (capacidad 10, metemos 9)
+-- INSERT INTO reservas_sucursales VALUES
+-- ('PK-1-1-002', GETDATE(), 1, '2026-06-15', 1, 1, 'barra', '13:00', 6, 0, 1500.00, 0, NULL),
+-- ('PK-1-1-003', GETDATE(), 1, '2026-06-15', 1, 1, 'barra', '13:00', 3, 0, 1500.00, 0, NULL);
+
+-- -- 🔴 TURNO LLENO - patio 21:00 (capacidad 20, metemos 20)
+-- INSERT INTO reservas_sucursales VALUES
+-- ('PK-1-1-004', GETDATE(), 1, '2026-06-15', 1, 1, 'patio', '21:00', 8, 2, 1500.00, 0, NULL),
+-- ('PK-1-1-005', GETDATE(), 1, '2026-06-15', 1, 1, 'patio', '21:00', 7, 3, 1500.00, 0, NULL);
+
+-- -- ============================================================
+-- -- SUCURSAL 2 - Güemes
+-- -- ============================================================
+
+-- -- ✅ TURNO CON CUPO DISPONIBLE - salon 12:00 (1 reserva de 4, quedan 16)
+-- INSERT INTO reservas_sucursales VALUES
+-- ('PK-1-2-001', GETDATE(), 1, '2026-06-15', 1, 2, 'salon', '12:00', 4, 0, 1500.00, 0, NULL);
+
+-- -- ⚠️ TURNO CASI LLENO - barra 20:00 (capacidad 5, metemos 4)
+-- INSERT INTO reservas_sucursales VALUES
+-- ('PK-1-2-002', GETDATE(), 1, '2026-06-15', 1, 2, 'barra', '20:00', 4, 0, 1500.00, 0, NULL);
+
+-- -- 🔴 TURNO LLENO - patio 20:00 (capacidad 20, metemos 20)
+-- INSERT INTO reservas_sucursales VALUES
+-- ('PK-1-2-003', GETDATE(), 1, '2026-06-15', 1, 2, 'patio', '20:00', 10, 4, 1500.00, 0, NULL),
+-- ('PK-1-2-004', GETDATE(), 1, '2026-06-15', 1, 2, 'patio', '20:00', 6, 0, 1500.00, 0, NULL);
+
+
+
+-- EXEC dbo.sp_obtener_disponibilidad_por_zona 1, '2026-06-15', 'salon'  -- disponible
+
+
+-- EXEC dbo.sp_obtener_disponibilidad_por_zona 1, '2026-06-15', 'barra'  -- casi lleno
+
+-- EXEC dbo.sp_obtener_disponibilidad_por_zona 1, '2026-06-15', 'patio'  -- lleno
 
 select * from clicks_contenidos
