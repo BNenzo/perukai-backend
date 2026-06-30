@@ -185,16 +185,16 @@ INSERT INTO zonas_turnos_sucursales VALUES
 (1,2,'patio','12:00',0),
 (1,2,'patio','20:00',0);
 
-CREATE TABLE clientes (
-    nro_cliente INT PRIMARY KEY,
+CREATE TABLE  clientes (
+    nro_cliente INT PRIMARY KEY IDENTITY (1,1),
     apellido VARCHAR(100) NOT NULL,
     nombre VARCHAR(100) NOT NULL,
     correo VARCHAR(150) UNIQUE NOT NULL,
     telefonos VARCHAR(50)
 );
 
-INSERT INTO clientes VALUES
-(1,'Letona','Renzo','renzo.letona@example.com','351-1112233');
+INSERT INTO clientes (apellido, nombre, correo, telefonos) VALUES
+('Letona','Renzo','renzo.letona@example.com','351-1112233');
 
 CREATE TABLE reservas_sucursales (
     cod_reserva VARCHAR(50) PRIMARY KEY,
@@ -323,6 +323,7 @@ CREATE TABLE contenidos (
     publicado INT NOT NULL DEFAULT 0,
     costo_click DECIMAL(10,2) NOT NULL DEFAULT 0,
     nro_sucursal INT,
+    cod_contenido_restaurante VARCHAR(255), -- {PREFIJO - {nroRestaurante} - {nroSucursal} - {nroContenido}}
     PRIMARY KEY (nro_restaurante, nro_contenido),
     FOREIGN KEY (nro_restaurante) REFERENCES restaurantes (nro_restaurante),
     FOREIGN KEY (nro_restaurante, nro_sucursal)
@@ -330,9 +331,9 @@ CREATE TABLE contenidos (
 );
 
 INSERT INTO contenidos VALUES
-(1,1,'Maki Acevichado','https://www.grupolegovic.com/wp-content/uploads/2022/04/makis-acevichados.jpg',0,37.00,1),
-(1,2,'Pulpo al olivo','https://imag.bonviveur.com/pulpo-al-olivo.jpg',0,40.50,1),
-(1,3,'Ceviche Nikkei','https://static.wixstatic.com/media/f50a6c_55fcd867d0554e4a804e4ba98b8c11dc~mv2.jpg/v1/fill/w_980,h_849,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/f50a6c_55fcd867d0554e4a804e4ba98b8c11dc~mv2.jpg',0,50.00,1);
+(1,1,'Maki Acevichado','https://www.grupolegovic.com/wp-content/uploads/2022/04/makis-acevichados.jpg',0,37.00,1, 'PK-1-1-1'),
+(1,2,'Pulpo al olivo','https://imag.bonviveur.com/pulpo-al-olivo.jpg',0,40.50,1, 'PK-1-1-2'),
+(1,3,'Ceviche Nikkei','https://static.wixstatic.com/media/f50a6c_55fcd867d0554e4a804e4ba98b8c11dc~mv2.jpg/v1/fill/w_980,h_849,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/f50a6c_55fcd867d0554e4a804e4ba98b8c11dc~mv2.jpg',0,50.00,2, 'PK-1-2-3');
 
 CREATE TABLE clicks_contenidos (
     nro_restaurante INT NOT NULL,
@@ -369,7 +370,7 @@ IF OBJECT_ID('dbo.sp_insert_click_contenido', 'P') IS NOT NULL
 GO
 
 CREATE OR ALTER PROCEDURE dbo.sp_insert_click_contenido
-    @nro_restaurante     INT,
+    @cod_contenido_restaurante VARCHAR(255),
     @nro_contenido       INT,
     @nro_click           INT,
     @fecha_hora_registro DATETIME,
@@ -378,6 +379,17 @@ CREATE OR ALTER PROCEDURE dbo.sp_insert_click_contenido
 AS
 BEGIN
     SET NOCOUNT ON;
+
+    DECLARE @nro_restaurante INT;
+
+    SELECT @nro_restaurante = nro_restaurante
+    FROM dbo.contenidos
+    WHERE cod_contenido_restaurante = @cod_contenido_restaurante;
+
+    IF @nro_restaurante IS NULL
+    BEGIN
+        ;THROW 50001, 'No se encontro el restaurante para el cod_contenido_restaurante indicado.', 1;
+    END
 
     BEGIN TRY
         BEGIN TRAN;
@@ -424,7 +436,8 @@ BEGIN
         imagen_a_publicar,
         publicado,
         costo_click,
-        nro_sucursal
+        nro_sucursal,
+        cod_contenido_restaurante
     FROM contenidos
     WHERE publicado = 0;
 END
@@ -433,7 +446,6 @@ GO
 
 -- INSERT CLIENTE DESDE RISTORINO SOLO SI NO EXISTE
 CREATE OR ALTER PROCEDURE sp_insert_cliente_desde_ristorino
-  @nro_cliente INT,
   @apellido VARCHAR(100),
   @nombre VARCHAR(100),
   @correo VARCHAR(150),
@@ -445,24 +457,26 @@ BEGIN
   IF NOT EXISTS (
     SELECT 1
     FROM clientes
-    WHERE nro_cliente = @nro_cliente
+    WHERE correo = @correo
   )
   BEGIN
     INSERT INTO clientes (
-      nro_cliente,
       apellido,
       nombre,
       correo,
       telefonos
     )
     VALUES (
-      @nro_cliente,
       @apellido,
       @nombre,
       @correo,
       @telefonos
     );
   END
+
+  SELECT nro_cliente
+  FROM clientes
+  WHERE correo = @correo;
 END;
 GO
 
@@ -707,4 +721,5 @@ GO
 
 -- EXEC dbo.sp_obtener_disponibilidad_por_zona 1, '2026-06-15', 'patio'  -- lleno
 
-select * from clicks_contenidos
+select * from clientes
+

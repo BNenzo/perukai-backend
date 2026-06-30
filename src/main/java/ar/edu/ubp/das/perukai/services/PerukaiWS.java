@@ -38,12 +38,13 @@ public class PerukaiWS {
   @RequestWrapper(localName = "RegistrarClickContenidoRequest")
   @ResponseWrapper(localName = "RegistrarClickContenidoResponse")
   public void registrarClickContenido(@WebParam(name = "Body") String body) {
-    JsonObject json = JsonParser.parseString(body).getAsJsonObject();
 
+    Integer nroCliente = null;
+    // Transformar JSON String a Json
+    JsonObject json = JsonParser.parseString(body).getAsJsonObject();
     if (json.has("nroCliente") && !json.get("nroCliente").isJsonNull()) {
       // 1) Insertar cliente
-      perukaiRepository.insertarClienteDesdeRistorino(
-          json.get("nroCliente").getAsInt(),
+      nroCliente = perukaiRepository.insertarClienteDesdeRistorino(
           json.get("apellido").getAsString(),
           json.get("nombre").getAsString(),
           json.get("correo").getAsString(),
@@ -51,12 +52,12 @@ public class PerukaiWS {
     }
 
     perukaiRepository.registrarClickContenido(
-        json.get("nroRestaurante").getAsInt(),
+        json.get("codContenidoRestaurante").getAsString(),
         json.get("nroContenido").getAsInt(),
         json.get("nroClick").getAsInt(),
         json.get("fechaHoraRegistro").getAsString(),
         (json.has("nroCliente") && !json.get("nroCliente").isJsonNull())
-            ? json.get("nroCliente").getAsInt()
+            ? nroCliente
             : null,
         json.get("costoClick").getAsBigDecimal());
   }
@@ -102,8 +103,7 @@ public class PerukaiWS {
     String codReservaSucursal = Utils.generarCodigoReserva();
 
     // 1) Insertar cliente
-    perukaiRepository.insertarClienteDesdeRistorino(
-        reservaCliente.getCliente().getNroCliente(),
+    perukaiRepository.insertarClienteDesdeRistorino( // aca sacamos lo del cliente
         reservaCliente.getCliente().getApellido(),
         reservaCliente.getCliente().getNombre(),
         reservaCliente.getCliente().getCorreo(),

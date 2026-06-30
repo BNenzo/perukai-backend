@@ -1,5 +1,6 @@
 package ar.edu.ubp.das.perukai.repositories;
 
+import ar.edu.ubp.das.perukai.beans.ClienteResponseBean;
 import ar.edu.ubp.das.perukai.beans.ContenidoNoPublicadoResponseBean;
 import ar.edu.ubp.das.perukai.beans.ObtenerDisponibilidadHorariaZonaResponseBean;
 import ar.edu.ubp.das.perukai.components.SimpleJdbcCallFactory;
@@ -19,14 +20,14 @@ public class PerukaiRepository {
   private SimpleJdbcCallFactory jdbcCallFactory;
 
   // REGISTRAR CLICKS DE UN CONTENIDO
-  public void registrarClickContenido(int nroRestaurante,
+  public void registrarClickContenido(String codContenidoRestaurante,
       int nroContenido,
       int nroClick,
       String fechaHoraRegistro,
       Integer nroCliente,
       BigDecimal costoClick) {
     MapSqlParameterSource p = new MapSqlParameterSource()
-        .addValue("nro_restaurante", nroRestaurante)
+        .addValue("cod_contenido_restaurante", codContenidoRestaurante)
         .addValue("nro_contenido", nroContenido)
         .addValue("nro_click", nroClick)
         .addValue("fecha_hora_registro", fechaHoraRegistro)
@@ -50,24 +51,26 @@ public class PerukaiRepository {
   // ===============================
   // INSERT CLIENTE DESDE RISTORINO
   // ===============================
-  public void insertarClienteDesdeRistorino(
-      Integer nroCliente,
+  public Integer insertarClienteDesdeRistorino(
       String apellido,
       String nombre,
       String correo,
       String telefonos) {
 
     MapSqlParameterSource p = new MapSqlParameterSource()
-        .addValue("nro_cliente", nroCliente)
         .addValue("apellido", apellido)
         .addValue("nombre", nombre)
         .addValue("correo", correo)
         .addValue("telefonos", telefonos);
 
-    jdbcCallFactory.execute(
+    List<ClienteResponseBean> result = jdbcCallFactory.executeQuery(
         "sp_insert_cliente_desde_ristorino",
         "dbo",
-        p);
+        p,
+        "cliente",
+        ClienteResponseBean.class);
+
+    return result.get(0).getNroCliente();
   }
 
   // ===============================
