@@ -486,7 +486,6 @@ CREATE OR ALTER PROCEDURE sp_crear_reserva_sucursal
   @cod_reserva VARCHAR(50),
   @nro_cliente INT,
   @fecha_reserva DATE,
-  @nro_restaurante INT,
   @nro_sucursal INT,
   @cod_zona CHAR(5),
   @hora_reserva TIME,
@@ -517,7 +516,7 @@ BEGIN
     CURRENT_TIMESTAMP,
     @nro_cliente,
     @fecha_reserva,
-    @nro_restaurante,
+    1,
     @nro_sucursal,
     @cod_zona,
     @hora_reserva,
@@ -723,3 +722,4 @@ GO
 
 select * from clientes
 
+select * from contenidos

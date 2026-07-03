@@ -80,7 +80,6 @@ public class PerukaiRepository {
       String codReserva,
       Integer nroCliente,
       LocalDate fechaReserva,
-      Integer nroRestaurante,
       Integer nroSucursal,
       String codZona,
       LocalTime horaReserva,
@@ -92,7 +91,6 @@ public class PerukaiRepository {
         .addValue("cod_reserva", codReserva)
         .addValue("nro_cliente", nroCliente)
         .addValue("fecha_reserva", fechaReserva)
-        .addValue("nro_restaurante", nroRestaurante)
         .addValue("nro_sucursal", nroSucursal)
         .addValue("cod_zona", codZona)
         .addValue("hora_reserva", horaReserva)

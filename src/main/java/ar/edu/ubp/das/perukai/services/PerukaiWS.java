@@ -83,21 +83,21 @@ public class PerukaiWS {
 
     if (opt.isEmpty()) {
       // no existe turno para esa hora
-      throw new RuntimeException("No hay turno para la hora solicitada");
+      throw new RuntimeException("RESERVA_TURNO_INEXISTENTE");
     }
 
     ObtenerDisponibilidadHorariaZonaResponseBean turno = opt.get();
 
     // Validaciones sobre el encontrado
     if (turno.getHabilitado() != null && turno.getHabilitado() == 0) {
-      throw new RuntimeException("El turno no está habilitado");
+      throw new RuntimeException("RESERVA_TURNO_NO_HABILITADO");
     }
     if (turno.getCupoDisponible() == null || turno.getCupoDisponible() <= 0) {
-      throw new RuntimeException("No hay cupo disponible");
+      throw new RuntimeException("RESERVA_SIN_CUPO");
     }
     if (turno.getCupoDisponible() < reservaCliente.getReserva().getCantAdultos()
         + reservaCliente.getReserva().getCantMenores()) {
-      throw new RuntimeException("No hay cupo disponible para la cantidad de comensales solicitada");
+      throw new RuntimeException("RESERVA_CUPO_INSUFICIENTE");
     }
 
     String codReservaSucursal = Utils.generarCodigoReserva();
@@ -114,7 +114,6 @@ public class PerukaiWS {
         codReservaSucursal,
         reservaCliente.getReserva().getNroCliente(),
         LocalDate.parse(reservaCliente.getReserva().getFechaReserva()),
-        reservaCliente.getReserva().getNroRestaurante(),
         reservaCliente.getReserva().getNroSucursal(),
         reservaCliente.getReserva().getCodZona(),
         LocalTime.parse(reservaCliente.getReserva().getHoraReserva()),
